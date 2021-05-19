@@ -1,0 +1,16 @@
+﻿  Camera.cpp
+  CameraController.cpp
+  Delegates.cpp
+  Game.cpp
+  InputDevice.cpp
+D:\универ\магистратура\1 курс\Графика\Fraemwork\Fraemwork\InputDevice.cpp(73,32): warning C4244: 'argument': conversion from 'LONG' to 'float', possible loss of data
+D:\универ\магистратура\1 курс\Графика\Fraemwork\Fraemwork\InputDevice.cpp(73,27): warning C4244: 'argument': conversion from 'LONG' to 'float', possible loss of data
+D:\универ\магистратура\1 курс\Графика\Fraemwork\Fraemwork\InputDevice.cpp(74,37): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+D:\универ\магистратура\1 курс\Графика\Fraemwork\Fraemwork\InputDevice.cpp(74,29): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+  main.cpp
+  DisplayWin32.cpp
+  SimpleMath.cpp
+  TransformGame.cpp
+  TriangleComponent.cpp
+  Generating Code...
+  Fraemwork.vcxproj -> D:\универ\магистратура\1 курс\Графика\Fraemwork\Debug\Fraemwork.exe
