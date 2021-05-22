@@ -22,7 +22,7 @@ void TriangleComponent::Draw(float deltaTime) {
 	context->RSSetState(rastState);
 
 	context->IASetInputLayout(layout);
-	context->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	context->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);//D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST
 	//context->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
 	context->IASetVertexBuffers(0, 1, &vertices, &stride, &offset);
 	context->VSSetShader(vertexShader, nullptr, 0);
@@ -33,10 +33,11 @@ void TriangleComponent::Draw(float deltaTime) {
 	
 
 	annotation->BeginEvent(L"BeginDraw");
-	context->DrawIndexed(6, 0, 0);
+	context->DrawIndexed(6,0, 0);
 	annotation->EndEvent();
 
 	context->RSSetState(rastState);
+	if(oldState)
 	oldState->Release();
 
 }
@@ -48,7 +49,7 @@ HRESULT TriangleComponent::CreateShader(LPCWSTR fileName, LPCSTR entryPoint, LPC
 		nullptr /*include*/,
 		entryPoint,
 		shaderModel,
-		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION,
+		D3DCOMPILE_PACK_MATRIX_ROW_MAJOR,
 		0,
 		vertexBC,
 		&errorVertexCode);
@@ -71,9 +72,9 @@ HRESULT TriangleComponent::Initialize() {
 	res = CreateShader(L"Simple.hlsl", "VSMain", "vs_5_0", &VertexShaderByteCode, nullptr);
 	if (FAILED(res)) return res;
 
-	D3D_SHADER_MACRO Shader_Macros[] = { "TEST", "1", "TCOLOR", "float4(0.0f, 1.0f, 0.0f, 1.0f)", nullptr, nullptr };
+	//D3D_SHADER_MACRO Shader_Macros[] = { "TEST", "1", "TCOLOR", "float4(0.0f, 1.0f, 0.0f, 1.0f)", nullptr, nullptr };
 	;
-	res = CreateShader(L"Simple.hlsl", "PSMain", "ps_5_0", &PixelShaderByteCode, Shader_Macros);
+	res = CreateShader(L"Simple.hlsl", "PSMain", "ps_5_0", &PixelShaderByteCode, nullptr);
 	if (FAILED(res)) return res;
 
 	D3D11_INPUT_ELEMENT_DESC inputElements[] = {
@@ -85,21 +86,36 @@ HRESULT TriangleComponent::Initialize() {
 
 	res = device->CreateInputLayout(inputElements, 2, VertexShaderByteCode->GetBufferPointer(), VertexShaderByteCode->GetBufferSize(), &layout);
 	
-	int n = 8;
+	int n = 10;
 	points = new Vector4[n] {
-		Vector4(0.5f, 0.5f, 0.5f, 1.0f), Vector4(1.0f, 0.0f, 0.0f, 1.0f),
-			Vector4(-0.5f, -0.5f, 0.5f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f),
-			Vector4(0.5f, -0.5f, 0.5f, 1.0f), Vector4(0.0f, 1.0f, 0.0f, 1.0f),
-			Vector4(-0.5f, 0.5f, 0.5f, 1.0f), Vector4(1.0f, 1.0f, 1.0f, 1.0f),
+		Vector4(50.0f, 50.5f, 0.0f, 1.0f), Vector4(1.0f, 0.0f, 0.0f, 1.0f),
+			Vector4(50.5f, -50.5f, 0.0f, 1.0f), Vector4(0.0f, 1.0f, 0.0f, 1.0f),
+			Vector4(-50.5f, -50.5f, 0.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f)
 	};
-	indeces = new int[]{ 0,1,2, 1,0,3 };
-	D3D11_BUFFER_DESC indexBufDesc = {};
+	/*points = new Vector4[n]{
+		 Vector4(0.0f,  1.5f,  0.0f,1.0f), Vector4(1.0f, 1.0f, 0.0f, 1.0f),
+		 Vector4(-1.0f,  0.0f, -1.0f,1.0f), Vector4(0.0f, 1.0f, 0.0f, 1.0f),
+		 Vector4(1.0f,  0.0f, -1.0f,1.0f), Vector4(1.0f, 0.0f, 0.0f, 1.0f),
+		 Vector4(-1.0f,  0.0f,  1.0f,1.0f), Vector4(0.0f, 1.0f, 1.0f, 1.0f),
+		 Vector4(1.0f,  0.0f,  1.0f,1.0f), Vector4(1.0f, 0.0f, 1.0f, 1.0f)
+	};
+	indeces =new int[]
+	{
+		0,2,1,
+		0,3,4,
+		0,1,3,
+		0,4,2,
+		1,2,3,
+		2,4,3,
+	};*/
+	//auto n = 18;
+	/*D3D11_BUFFER_DESC indexBufDesc = {};
 	indexBufDesc.Usage = D3D11_USAGE_DEFAULT;
 	indexBufDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	indexBufDesc.CPUAccessFlags = 0;
 	indexBufDesc.MiscFlags = 0;
 	indexBufDesc.StructureByteStride = 0;
-	indexBufDesc.ByteWidth = sizeof(int) * 6;
+	indexBufDesc.ByteWidth = sizeof(int) * 18;
 
 	D3D11_SUBRESOURCE_DATA indexData = {};
 	indexData.pSysMem = indeces;
@@ -107,14 +123,14 @@ HRESULT TriangleComponent::Initialize() {
 	indexData.SysMemSlicePitch = 0;
 
 	ID3D11Buffer* ib;
-	device->CreateBuffer(&indexBufDesc, &indexData, &ib);
+	device->CreateBuffer(&indexBufDesc, &indexData, &ib);*/
 	D3D11_BUFFER_DESC vertexBufDesc = {};
 	vertexBufDesc.Usage = D3D11_USAGE_DEFAULT;
 	vertexBufDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufDesc.CPUAccessFlags = 0;
 	vertexBufDesc.MiscFlags = 0;
-	vertexBufDesc.StructureByteStride = 0;//32
-	vertexBufDesc.ByteWidth = sizeof(Vector4) * n;
+	vertexBufDesc.StructureByteStride = 32;
+	vertexBufDesc.ByteWidth = sizeof(Vector4) * 6;
 
 	D3D11_SUBRESOURCE_DATA vertexData = {};
 	vertexData.pSysMem = points;
@@ -124,14 +140,14 @@ HRESULT TriangleComponent::Initialize() {
 	res = device->CreateBuffer(&vertexBufDesc, &vertexData, &vertices);
 	
 
-	D3D11_BUFFER_DESC constBufDesc = {};
-	vertexBufDesc.Usage = D3D11_USAGE_DYNAMIC;
-	vertexBufDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vertexBufDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	vertexBufDesc.MiscFlags = 0;
-	vertexBufDesc.StructureByteStride = 0;
-	vertexBufDesc.ByteWidth = sizeof(Matrix);
-	res = device->CreateBuffer(&constBufDesc, nullptr, &constantBuffer);
+	/*D3D11_BUFFER_DESC constBufDesc = {};
+	constBufDesc.Usage = D3D11_USAGE_DYNAMIC;
+	constBufDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	constBufDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	constBufDesc.MiscFlags = 0;
+	constBufDesc.StructureByteStride = 0;
+	constBufDesc.ByteWidth = sizeof(Matrix);
+	res = device->CreateBuffer(&constBufDesc, nullptr, &constantBuffer);*/
 
 	
 	CD3D11_RASTERIZER_DESC rastDesc = {};
@@ -139,8 +155,8 @@ HRESULT TriangleComponent::Initialize() {
 	rastDesc.FillMode = D3D11_FILL_SOLID;
 
 	res = device->CreateRasterizerState(&rastDesc, &rastState);
-	context->QueryInterface(IID_ID3DUserDefinedAnnotation, (void**)&annotation);
-
+	res = context->QueryInterface(IID_ID3DUserDefinedAnnotation, (void**)&annotation);
+	
 	return res;
 }
 void TriangleComponent::Update(float deltaTime) {

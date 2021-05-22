@@ -1,7 +1,6 @@
 #pragma once
 #include "Game.h"
 #include "CameraController.h"
-#include "SimpleMath.h"
 class TransformGame : public Game
 {
 public:
@@ -10,6 +9,7 @@ public:
 	TriangleComponent* tri;
 	TransformGame(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow) :Game(hInstance, hPrevInstance,pScmdline, iCmdshow)
 	{
+		tGame = this;
 	}
 	virtual void Initialize() override;
 	virtual void Update(float deltaTime) override;

@@ -5,8 +5,10 @@
 #include <d3d11_4.h>
 #include <d3dcompiler.h>
 #include <iostream>
-#include "SimpleMath.h"
 #include "Camera.h"
+#include <directxmath.h>
+#include <vector>
+#include "SimpleMath.h"
 #pragma comment(lib, "d3d11.lib")
 
 class GameComponent {

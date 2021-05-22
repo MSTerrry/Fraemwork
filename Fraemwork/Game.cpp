@@ -1,15 +1,15 @@
 #include "Game.h"
-
+Game* GlobalGame;
 LRESULT CALLBACK Game::WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
-{
+{	
 	switch (umessage)
-	{
+	{	
 	case WM_DESTROY:
 	case WM_CLOSE:
 	{
 		PostQuitMessage(0);
 		return 0;
-	}
+	}	
 	case WM_SIZE:
 	{
 		std::cout << "Width " << LOWORD(lparam) << " Height " << HIWORD(lparam) << std::endl;
@@ -18,39 +18,84 @@ LRESULT CALLBACK Game::WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM l
 	case WM_KEYDOWN:
 	{
 		std::cout << "Key: " << static_cast<unsigned int>(wparam) << std::endl;
-
 		if (static_cast<unsigned int>(wparam) == 27) PostQuitMessage(0);
 		return 0;
-	}
+	}	
 	case WM_KEYUP:
 		return 0;
+	case WM_INPUT:
+	{
+		UINT dwSize = 0;
+		GetRawInputData(reinterpret_cast<HRAWINPUT>(lparam), RID_INPUT, nullptr, &dwSize, sizeof(RAWINPUTHEADER));
+		LPBYTE lpb = new BYTE[dwSize];
+		if (lpb == nullptr) {
+			return 0;
+		}
+
+		if (GetRawInputData((HRAWINPUT)lparam, RID_INPUT, lpb, &dwSize, sizeof(RAWINPUTHEADER)) != dwSize)
+			OutputDebugString(TEXT("GetRawInputData does not return correct size !\n"));
+
+		RAWINPUT* raw = reinterpret_cast<RAWINPUT*>(lpb);	
+		//Game* pWnd = reinterpret_cast<Game*>(GetWindowLongPtrW(hwnd, 0));
+		if (raw->header.dwType == RIM_TYPEKEYBOARD)
+		{			
+			GlobalGame->InDevice->OnKeyDown({
+				raw->data.keyboard.MakeCode,
+				raw->data.keyboard.Flags,
+				raw->data.keyboard.VKey,
+				raw->data.keyboard.Message
+				});
+		}
+		else if (raw->header.dwType == RIM_TYPEMOUSE)
+		{
+			GlobalGame->InDevice->OnMouseMove({
+				raw->data.mouse.usFlags,
+				raw->data.mouse.usButtonFlags,
+				static_cast<int>(raw->data.mouse.ulExtraInformation),
+				static_cast<int>(raw->data.mouse.ulRawButtons),
+				static_cast<short>(raw->data.mouse.usButtonData),
+				raw->data.mouse.lLastX,
+				raw->data.mouse.lLastY
+				});
+		}
+
+		delete[] lpb;
+		return DefWindowProc(hwnd, umessage, wparam, lparam);
+	}
 	default:
 		return DefWindowProc(hwnd, umessage, wparam, lparam);
 	}
 }
 
 Game::Game(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow):Instance(hInstance)
-{
-
+{	
+	GlobalGame = this;
+	Initialize();		
 }
 
 void Game::Initialize()
-{	
+{		
 	Display = new DisplayWin32(Instance,WndProc);
 	if (!Display->hWnd) {
 		DestroyResources();
 		return;
-	}
+	}	
 	if (FAILED(PrepareResources())) {
 		DestroyResources();
 		return;
 	}
-
+	/*TriangleComponent tComp(Device, Context, nullptr);
+	tComp.Initialize();	
+	Components.push_back(&tComp);*/
 	/*if (FAILED(InitShaders())) {
 		DestroyResources();
 		return;
 	}*/
 
+	
+}
+
+void Game::Run() {
 	MSG msg = {};
 
 	// Loop until there is a quit message from the window or the user.
@@ -74,7 +119,11 @@ void Game::Initialize()
 	_debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
 }
 void Game::Update(float deltaTime) {
-
+	for (auto var : Components)
+	{
+		var->Draw(deltaTime);
+	}
+	swapChain1->Present(1, 0);
 }
 HRESULT Game::PrepareResources() {
 	HRESULT res;
@@ -156,10 +205,10 @@ int Game::Draw(HWND hWnd) {
 	PrevTime = curTime;
 
 	TotalTime += deltaTime;
-	frameCount++;
+	//frameCount++;
 
 
-	if (TotalTime > 1.0f) {
+	/*if (TotalTime > 1.0f) {
 		float fps = frameCount / TotalTime;
 
 		TotalTime = 0.0f;
@@ -169,14 +218,14 @@ int Game::Draw(HWND hWnd) {
 		SetWindowText(hWnd, text);
 
 		frameCount = 0;
-	}
+	}*/
 
-	float color[] = { TotalTime, 0.1f, 0.1f, 1.0f };
+	float color[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 	Context->OMSetRenderTargets(1, &RenderView, nullptr);
 	Context->ClearRenderTargetView(RenderView, color);
-
-	swapChain1->Present(1, 0);
+	tGame->Update(deltaTime);
+	
 	return 0;
 }
 

@@ -1,6 +1,9 @@
 #pragma once
 #include "InputDevice.h"
 #include "Camera.h"
+#include <directxmath.h>
+#include "SimpleMath.h"
+#include "Keys.h"
 using namespace DirectX::SimpleMath;
 class CameraController {
 	InputDevice* inputDevice;
@@ -12,7 +15,7 @@ public:
 	float MouseSensetivity = 1.0f;
 
 	Camera* camera;
-	Vector3 CameraPosition;
+	DirectX::SimpleMath::Vector3 CameraPosition;
 	CameraController(InputDevice* inDev, Camera* camera);
 	void Update(float deltaTime);
 

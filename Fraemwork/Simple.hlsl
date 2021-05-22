@@ -34,13 +34,16 @@ struct VS_MESH_IN
 	float4 text : TEXCOORD0;
 };
 
-struct PS_IN {
-	float4 pos : POSITION;
+struct PS_IN
+{
+	float4 pos : SV_POSITION;
 	float4 col : COLOR;
 };
 
-PS_IN VSMAIN(VS_IN output) {
+PS_IN VSMain(VS_IN input)
+{
 	PS_IN output = (PS_IN)0;
+
 	output.pos = mul(float4(input.pos.xyz, 1.0f), ConstData.WorldViewProj);
 	output.col = input.col;
 
@@ -50,7 +53,7 @@ PS_IN VSMAIN(VS_IN output) {
 PS_IN VSMainMesh(VS_MESH_IN input) {
 	PS_IN output = (PS_IN)0;
 	output.pos = mul(float4(input.pos.xyz, 1.0f), MeshData.Transform);
-	output.col = input.col;
+	output.col = MeshData.Color;
 
 	return output;
 
@@ -59,5 +62,6 @@ PS_IN VSMainMesh(VS_MESH_IN input) {
 float4 PSMain(PS_IN input) : SV_Target
 {
 	float4 col = input.col;
+
 	return col;
 }

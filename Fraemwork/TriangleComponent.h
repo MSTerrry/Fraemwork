@@ -1,7 +1,5 @@
 #pragma once
 #include "GameComponent.h"
-#include <directxmath.h>
-#include <vector>
 using namespace DirectX;
 class TriangleComponent : public GameComponent
 {

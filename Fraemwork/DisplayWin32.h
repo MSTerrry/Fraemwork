@@ -1,7 +1,6 @@
 #pragma once
 #include <iostream>
 #include "windows.h"
-
 class DisplayWin32 
 {
 public:

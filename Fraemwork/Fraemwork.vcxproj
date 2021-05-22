@@ -140,6 +140,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="SimpleMath.inl" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CameraController.cpp" />
     <ClCompile Include="Delegates.cpp" />
@@ -147,28 +150,27 @@
     <ClCompile Include="InputDevice.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="DisplayWin32.cpp" />
-    <ClCompile Include="SimpleMath.cpp" />
+    <ClCompile Include="pch.cpp" />
     <ClCompile Include="TransformGame.cpp" />
     <ClCompile Include="TriangleComponent.cpp" />
+    <ClCompile Include="SimpleMath.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraController.h" />
     <ClInclude Include="Delegates.h" />
-    <ClInclude Include="Export.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameComponent.h" />
     <ClInclude Include="InputDevice.h" />
-    <ClInclude Include="SimpleMath.h" />
+    <ClInclude Include="Keys.h" />
+    <ClInclude Include="pch.h" />
     <ClInclude Include="TransformGame.h" />
     <ClInclude Include="TriangleComponent.h" />
     <ClInclude Include="DisplayWin32.h" />
+    <ClInclude Include="Inc\SimpleMath.h" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Delegates.natvis" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="SimpleMath.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

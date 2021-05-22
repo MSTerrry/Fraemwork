@@ -7,7 +7,7 @@ DisplayWin32::DisplayWin32(HINSTANCE hInstance, WNDPROC WndProc) {
 
 	int posX, posY;
 	_applicationName = L"Game";
-	ScreenWidth = 800;
+	ScreenWidth = 1024;
 	ScreenHeight = 800;
 	wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 	wc.lpfnWndProc = WndProc;
@@ -29,11 +29,8 @@ DisplayWin32::DisplayWin32(HINSTANCE hInstance, WNDPROC WndProc) {
 		return;
 	}
 
-	ScreenWidth = GetSystemMetrics(SM_CXSCREEN);
-	ScreenHeight = GetSystemMetrics(SM_CYSCREEN);
-
-	ScreenWidth = 800;
-	ScreenHeight = 800;
+	/*ScreenWidth = GetSystemMetrics(SM_CXSCREEN);
+	ScreenHeight = GetSystemMetrics(SM_CYSCREEN);*/	
 
 	posX = (GetSystemMetrics(SM_CXSCREEN) - ScreenWidth) / 2;
 	posY = (GetSystemMetrics(SM_CYSCREEN) - ScreenHeight) / 2;
@@ -62,3 +59,4 @@ DisplayWin32::DisplayWin32(HINSTANCE hInstance, WNDPROC WndProc) {
 	ShowCursor(true);
 	return;
 }
+

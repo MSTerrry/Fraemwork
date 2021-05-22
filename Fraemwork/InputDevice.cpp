@@ -9,7 +9,7 @@ using namespace DirectX::SimpleMath;
 
 InputDevice::InputDevice(DisplayWin32* display) : Display(display)
 {
-	keys = new std::unordered_set<USHORT>();
+	keys = new std::unordered_set<Keys>();
 	
 	RAWINPUTDEVICE Rid[2];
 
@@ -38,11 +38,11 @@ InputDevice::~InputDevice()
 void InputDevice::OnKeyDown(KeyboardInputEventArgs args)
 {
 	bool Break = args.Flags & 0x01;
-	
-	auto key = args.VKey;
-	
-	if (args.MakeCode == 42) key = VK_LSHIFT;
-	if (args.MakeCode == 54) key = VK_RSHIFT;
+
+	auto key = (Keys)args.VKey;
+
+	if (args.MakeCode == 42) key = Keys::LeftShift;
+	if (args.MakeCode == 54) key = Keys::RightShift;
 	
 	if(Break) {
 		if(keys->count(key))	RemovePressedKey(key);
@@ -54,17 +54,17 @@ void InputDevice::OnKeyDown(KeyboardInputEventArgs args)
 void InputDevice::OnMouseMove(RawMouseEventArgs args)
 {
 	if(args.ButtonFlags & static_cast<int>(MouseButtonFlags::LeftButtonDown))
-		AddPressedKey(VK_LBUTTON);
+		AddPressedKey(Keys::LeftButton);
 	if (args.ButtonFlags & static_cast<int>(MouseButtonFlags::LeftButtonUp))
-		RemovePressedKey(VK_LBUTTON);
+		RemovePressedKey(Keys::LeftButton);
 	if (args.ButtonFlags & static_cast<int>(MouseButtonFlags::RightButtonDown))
-		AddPressedKey(VK_RBUTTON);
+		AddPressedKey(Keys::RightButton);
 	if (args.ButtonFlags & static_cast<int>(MouseButtonFlags::RightButtonUp))
-		RemovePressedKey(VK_RBUTTON);
+		RemovePressedKey(Keys::RightButton);
 	if (args.ButtonFlags & static_cast<int>(MouseButtonFlags::MiddleButtonDown))
-		AddPressedKey(VK_MBUTTON);
+		AddPressedKey(Keys::MiddleButton);
 	if (args.ButtonFlags & static_cast<int>(MouseButtonFlags::MiddleButtonUp))
-		RemovePressedKey(VK_MBUTTON);
+		RemovePressedKey(Keys::MiddleButton);
 
 	POINT p;
 	GetCursorPos(&p);
@@ -86,7 +86,7 @@ void InputDevice::OnMouseMove(RawMouseEventArgs args)
 	MouseMove.Broadcast(moveArgs);
 }
 
-void InputDevice::AddPressedKey(USHORT key)
+void InputDevice::AddPressedKey(Keys key)
 {
 	//if (!game->isActive) {
 	//	return;
@@ -94,12 +94,12 @@ void InputDevice::AddPressedKey(USHORT key)
 	keys->insert(key);
 }
 
-void InputDevice::RemovePressedKey(USHORT key)
+void InputDevice::RemovePressedKey(Keys key)
 {
 	keys->erase(key);
 }
 
-bool InputDevice::IsKeyDown(USHORT key)
+bool InputDevice::IsKeyDown(Keys key)
 {
 	return keys->count(key);
 }

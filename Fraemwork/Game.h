@@ -1,5 +1,3 @@
-#pragma once
-#include "windows.h"
 #pragma warning(disable : 4267)
 
 #define WIN32_LEAN_AND_MEAN
@@ -11,8 +9,8 @@
 #include "TriangleComponent.h"
 #include "GameComponent.h"
 #include <vector>
-#include "Game.h"
 #include "InputDevice.h"
+#include "Keys.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -38,6 +36,7 @@ public:
 	HINSTANCE Instance;
 	InputDevice* InDevice;
 
+	Game* tGame;	
 	ID3D11Device* Device = nullptr;
 	ID3D11Buffer* _vertexBuffer = nullptr;
 	ID3D11Buffer* _indexBuffer = nullptr;
@@ -56,7 +55,7 @@ public:
 
 	HRESULT PrepareResources();
 	HRESULT InitShaders();
-	
+		
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam);
 	int Draw(HWND hwnd);
 	void DestroyResources();
@@ -65,5 +64,6 @@ public:
 	virtual void Update(float deltaTime);
 	virtual void PostDraw(float deltaTime);
 	virtual void Exit();
+	virtual void Run();
 	Game(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow);
 };
