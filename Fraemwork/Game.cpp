@@ -15,14 +15,6 @@ LRESULT CALLBACK Game::WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM l
 		std::cout << "Width " << LOWORD(lparam) << " Height " << HIWORD(lparam) << std::endl;
 		return 0;
 	}
-	case WM_KEYDOWN:
-	{
-		std::cout << "Key: " << static_cast<unsigned int>(wparam) << std::endl;
-		if (static_cast<unsigned int>(wparam) == 27) PostQuitMessage(0);
-		return 0;
-	}	
-	case WM_KEYUP:
-		return 0;
 	case WM_INPUT:
 	{
 		UINT dwSize = 0;
@@ -36,7 +28,7 @@ LRESULT CALLBACK Game::WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM l
 			OutputDebugString(TEXT("GetRawInputData does not return correct size !\n"));
 
 		RAWINPUT* raw = reinterpret_cast<RAWINPUT*>(lpb);	
-		//Game* pWnd = reinterpret_cast<Game*>(GetWindowLongPtrW(hwnd, 0));
+
 		if (raw->header.dwType == RIM_TYPEKEYBOARD)
 		{			
 			GlobalGame->InDevice->OnKeyDown({
@@ -83,23 +75,14 @@ void Game::Initialize()
 	if (FAILED(PrepareResources())) {
 		DestroyResources();
 		return;
-	}
-	/*TriangleComponent tComp(Device, Context, nullptr);
-	tComp.Initialize();	
-	Components.push_back(&tComp);*/
-	/*if (FAILED(InitShaders())) {
-		DestroyResources();
-		return;
-	}*/
-
-	
+	}	
 }
 
 void Game::Run() {
 	MSG msg = {};
 
 	// Loop until there is a quit message from the window or the user.
-	bool isExitRequested = false;
+	
 	while (!isExitRequested) {
 		// Handle the windows messages.
 		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
@@ -188,15 +171,10 @@ void Game::CreateBackBuffer(TriangleComponent tComp) {
 
 }
 void Game::Exit() {
-
+	isExitRequested = true;
 }
 HRESULT Game::InitShaders() {
-	//HRESULT res;	
 
-	////TriangleComponent tComp(Device,Context,Camera);
-	//res = tComp.Initialize();
-	//if (FAILED(res)) return res;
-	//Components.push_back(&tComp);		
 	return S_OK;
 }
 
@@ -206,21 +184,7 @@ int Game::Draw(HWND hWnd) {
 	PrevTime = curTime;
 
 	TotalTime += deltaTime;
-	//frameCount++;
-
-
-	/*if (TotalTime > 1.0f) {
-		float fps = frameCount / TotalTime;
-
-		TotalTime = 0.0f;
-
-		WCHAR text[256];
-		swprintf_s(text, TEXT("FPS: %f"), fps);
-		SetWindowText(hWnd, text);
-
-		frameCount = 0;
-	}*/
-
+	
 	float color[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 	Context->OMSetRenderTargets(1, &RenderView, nullptr);

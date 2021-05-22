@@ -29,6 +29,8 @@
 #define ZCHECK(exp) if(FAILED(exp)) { printf("Check failed at file: %s at line %i", __FILE__, __LINE__); return 0; }
 
 class Game {
+
+	bool isExitRequested;
 public:	
 
 	std::vector<GameComponent*> Components;
