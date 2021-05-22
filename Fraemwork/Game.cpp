@@ -120,7 +120,8 @@ void Game::Run() {
 }
 void Game::Update(float deltaTime) {
 	for (auto var : Components)
-	{
+	{		
+		var->Update(deltaTime);
 		var->Draw(deltaTime);
 	}
 	swapChain1->Present(1, 0);

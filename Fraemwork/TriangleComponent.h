@@ -21,6 +21,7 @@ private:
 	ID3D11InputLayout* layout = nullptr;	
 	ID3D11Buffer* vertices = nullptr;
 	ID3D11Buffer* constantBuffer = nullptr;
+	ID3D11Buffer* indexBuffer = nullptr;
 	ID3D11RasterizerState* rastState=nullptr;
 	DirectX::SimpleMath::Vector4* points = nullptr;
 	ID3DUserDefinedAnnotation* annotation = nullptr;
