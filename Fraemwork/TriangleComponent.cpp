@@ -87,11 +87,6 @@ HRESULT TriangleComponent::Initialize() {
 	res = device->CreateInputLayout(inputElements, 2, VertexShaderByteCode->GetBufferPointer(), VertexShaderByteCode->GetBufferSize(), &layout);
 	
 	int n = 10;
-	/*points = new Vector4[n] {
-		Vector4(50.0f, 50.5f, 0.0f, 1.0f), Vector4(1.0f, 0.0f, 0.0f, 1.0f),
-			Vector4(50.5f, -50.5f, 0.0f, 1.0f), Vector4(0.0f, 1.0f, 0.0f, 1.0f),
-			Vector4(-50.5f, -50.5f, 0.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f)
-	};*/
 	points = new Vector4[n]{
 		 Vector4(0.0f,  1.5f,  0.0f,1.0f), Vector4(1.0f, 1.0f, 0.0f, 1.0f),
 		 Vector4(-1.0f,  0.0f, -1.0f,1.0f), Vector4(0.0f, 1.0f, 0.0f, 1.0f),
@@ -108,7 +103,6 @@ HRESULT TriangleComponent::Initialize() {
 		1,2,3,
 		2,4,3,
 	};
-	//auto n = 18;
 	D3D11_BUFFER_DESC indexBufDesc = {};
 	indexBufDesc.Usage = D3D11_USAGE_DEFAULT;
 	indexBufDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
@@ -150,7 +144,7 @@ HRESULT TriangleComponent::Initialize() {
 
 	
 	CD3D11_RASTERIZER_DESC rastDesc = {};
-	rastDesc.CullMode = D3D11_CULL_BACK; //D3D11_CULL_NONE
+	rastDesc.CullMode = D3D11_CULL_NONE; //D3D11_CULL_NONE
 	rastDesc.FillMode = D3D11_FILL_SOLID;
 
 	res = device->CreateRasterizerState(&rastDesc, &rastState);

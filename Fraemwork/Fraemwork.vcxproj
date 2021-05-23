@@ -151,6 +151,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="DisplayWin32.cpp" />
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="PlaneComponent.cpp" />
     <ClCompile Include="TransformGame.cpp" />
     <ClCompile Include="TriangleComponent.cpp" />
     <ClCompile Include="SimpleMath.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="InputDevice.h" />
     <ClInclude Include="Keys.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="PlaneComponent.h" />
     <ClInclude Include="TransformGame.h" />
     <ClInclude Include="TriangleComponent.h" />
     <ClInclude Include="DisplayWin32.h" />

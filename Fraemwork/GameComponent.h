@@ -11,6 +11,7 @@
 #include "SimpleMath.h"
 #pragma comment(lib, "d3d11.lib")
 
+
 class GameComponent {
 public:
 	//Game game;

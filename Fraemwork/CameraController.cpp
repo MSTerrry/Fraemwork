@@ -5,20 +5,21 @@ CameraController::CameraController(InputDevice* inDev,Camera* camera):camera(cam
 	Yaw = 0;
 	Pitch = 0;
 	CameraController& cont = *this;
-	CameraPosition = DirectX::SimpleMath::Vector3(1, 1, 1);
+	CameraPosition = DirectX::SimpleMath::Vector3(0, 1, 1);
 	inputDevice->MouseMove.AddRaw(this, &CameraController::OnMouseMove);
 }
 
 void CameraController::Update(float deltaTime) {
 	auto rotMat = Matrix::CreateFromYawPitchRoll(Yaw, Pitch, 0);
 	auto velDirection = Vector3::Zero;
-	if (inputDevice->IsKeyDown(Keys::W)) velDirection += Vector3(1.0f, 0.0f, 0.0f);//W
-	if (inputDevice->IsKeyDown(Keys::S)) velDirection += Vector3(-1.0f, 0.0f, 0.0f);//S
-	if (inputDevice->IsKeyDown(Keys::A)) velDirection += Vector3(0.0f, 0.0f, -1.0f);//A
-	if (inputDevice->IsKeyDown(Keys::D)) velDirection += Vector3(0.0f, 0.0f, 1.0f);//D
+	if (inputDevice->IsKeyDown(Keys::W))
+		velDirection += Vector3(1.0f, 0.0f, 0.0f);
+	if (inputDevice->IsKeyDown(Keys::S)) velDirection += Vector3(-1.0f, 0.0f, 0.0f);
+	if (inputDevice->IsKeyDown(Keys::A)) velDirection += Vector3(0.0f, 0.0f, -1.0f);
+	if (inputDevice->IsKeyDown(Keys::D)) velDirection += Vector3(0.0f, 0.0f, 1.0f);
 
 	if (inputDevice->IsKeyDown(Keys::Space)) velDirection += Vector3(0.0f, 1.0f, 0.0f);
-	if (inputDevice->IsKeyDown(Keys::C)) velDirection += Vector3(0.0f, -1.0f, 0.0f);//C
+	if (inputDevice->IsKeyDown(Keys::C)) velDirection += Vector3(0.0f, -1.0f, 0.0f);
 
 	velDirection.Normalize();
 
