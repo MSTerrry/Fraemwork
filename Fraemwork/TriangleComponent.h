@@ -12,7 +12,7 @@ public:
 	virtual void Update(float deltaTime) override;
 	virtual void Reload() override;
 
-	DirectX::SimpleMath::Vector3 position;
+	DirectX::SimpleMath::Vector3 position;	
 private:
 	ID3D11VertexShader* vertexShader = nullptr;
 	ID3D11PixelShader* pixelShader = nullptr;

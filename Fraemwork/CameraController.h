@@ -11,7 +11,7 @@ public:
 	float Yaw;
 	float Pitch;
 
-	float VelocityMagnitude = 100.0f;
+	float VelocityMagnitude = 5.0f;
 	float MouseSensetivity = 1.0f;
 
 	Camera* camera;

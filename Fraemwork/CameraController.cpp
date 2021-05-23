@@ -5,15 +5,14 @@ CameraController::CameraController(InputDevice* inDev,Camera* camera):camera(cam
 	Yaw = 0;
 	Pitch = 0;
 	CameraController& cont = *this;
-	CameraPosition = DirectX::SimpleMath::Vector3(0, 1, 1);
+	CameraPosition = DirectX::SimpleMath::Vector3(1, 1, 1);
 	inputDevice->MouseMove.AddRaw(this, &CameraController::OnMouseMove);
 }
 
 void CameraController::Update(float deltaTime) {
 	auto rotMat = Matrix::CreateFromYawPitchRoll(Yaw, Pitch, 0);
 	auto velDirection = Vector3::Zero;
-	if (inputDevice->IsKeyDown(Keys::W))
-		velDirection += Vector3(1.0f, 0.0f, 0.0f);
+	if (inputDevice->IsKeyDown(Keys::W)) velDirection += Vector3(1.0f, 0.0f, 0.0f);
 	if (inputDevice->IsKeyDown(Keys::S)) velDirection += Vector3(-1.0f, 0.0f, 0.0f);
 	if (inputDevice->IsKeyDown(Keys::A)) velDirection += Vector3(0.0f, 0.0f, -1.0f);
 	if (inputDevice->IsKeyDown(Keys::D)) velDirection += Vector3(0.0f, 0.0f, 1.0f);
@@ -28,7 +27,8 @@ void CameraController::Update(float deltaTime) {
 		velDir.Normalize();
 	}
 
-	camera->ViewMatrix = Matrix::CreateLookAt(CameraPosition, CameraPosition * rotMat.Forward(), rotMat.Up());
+	CameraPosition = CameraPosition + velDir * VelocityMagnitude * deltaTime;
+	camera->ViewMatrix = Matrix::CreateLookAt(CameraPosition, CameraPosition + rotMat.Forward(), rotMat.Up());
 	camera->UpdateProjectionMatrix();
 }
 

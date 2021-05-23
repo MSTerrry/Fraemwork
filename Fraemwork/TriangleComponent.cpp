@@ -122,7 +122,7 @@ HRESULT TriangleComponent::Initialize() {
 	vertexBufDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufDesc.CPUAccessFlags = 0;
 	vertexBufDesc.MiscFlags = 0;
-	vertexBufDesc.StructureByteStride = 0;//32
+	vertexBufDesc.StructureByteStride = 0;
 	vertexBufDesc.ByteWidth = sizeof(Vector4) * 10;
 
 	D3D11_SUBRESOURCE_DATA vertexData = {};
@@ -153,7 +153,7 @@ HRESULT TriangleComponent::Initialize() {
 	return res;
 }
 void TriangleComponent::Update(float deltaTime) {
-	auto m = Matrix::CreateTranslation(position)*camera->ViewMatrix*camera->ProjMatrix;
+	auto m = Matrix::CreateTranslation(position) * camera->ViewMatrix * camera->ProjMatrix;
 
 	D3D11_MAPPED_SUBRESOURCE res = {};
 	context->Map(constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
