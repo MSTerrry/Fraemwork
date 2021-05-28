@@ -2,6 +2,7 @@
 #include "Game.h"
 #include "CameraController.h"
 #include "PlaneComponent.h"
+#include "tiny_obj_loader.h"
 class TransformGame : public Game
 {
 public:

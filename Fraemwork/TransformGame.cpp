@@ -13,28 +13,7 @@ void TransformGame::Initialize() {
 }
 void TransformGame::Update(float deltaTime) {
 	camController->Update(deltaTime);
-	float velocity = 5.0f;
-	DirectX::SimpleMath::Vector3 vector;
-
-	if (InDevice->IsKeyDown(Keys::A))
-	{
-		tri->position += velocity * DirectX::SimpleMath::Vector3::Left * deltaTime;
-		pc->position += velocity * DirectX::SimpleMath::Vector3::Left * deltaTime;
-	}
-	if (InDevice->IsKeyDown(Keys::D))
-	{
-		tri->position += velocity * DirectX::SimpleMath::Vector3::Right * deltaTime;
-		pc->position += velocity * DirectX::SimpleMath::Vector3::Right * deltaTime;
-	}
-	if (InDevice->IsKeyDown(Keys::W)) {
-		tri->position += velocity * DirectX::SimpleMath::Vector3::Down * deltaTime;
-		pc->position += velocity * DirectX::SimpleMath::Vector3::Down * deltaTime;
-	}
-	if (InDevice->IsKeyDown(Keys::S)) {
-		tri->position += velocity * DirectX::SimpleMath::Vector3::Up * deltaTime;
-		pc->position += velocity * DirectX::SimpleMath::Vector3::Up * deltaTime;
-	}
-
+	
 	if (InDevice->IsKeyDown(Keys::Escape))
 		Exit();
 	Game::Update(deltaTime);

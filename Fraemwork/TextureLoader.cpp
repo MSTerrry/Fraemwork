@@ -1,12 +1,8 @@
-#include "pch.h"
 #include "TextureLoader.h"
-#include "Game.h"
 
 
-TextureLoader::TextureLoader(ID3D11Device* device, ID3D11DeviceContext* context)
+TextureLoader::TextureLoader(ID3D11Device* device, ID3D11DeviceContext* context):Device(device), Context(context)
 {
-	Device = device;
-	Context = context;
 	// Initialize COM
 	CoInitialize(NULL);
 

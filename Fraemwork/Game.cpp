@@ -76,6 +76,7 @@ void Game::Initialize()
 		DestroyResources();
 		return;
 	}	
+	//CreateBackBuffer();
 }
 
 void Game::Run() {
@@ -162,12 +163,44 @@ HRESULT Game::PrepareResources() {
 	viewport.MaxDepth = 1.0f;
 
 	Context->RSSetViewports(1, &viewport);
-	Context->OMSetRenderTargets(1, &RenderView, nullptr);
+	Context->OMSetRenderTargets(1, &RenderView, DepthStencilView);
 
 	return res;
 }
-void Game::CreateBackBuffer(TriangleComponent tComp) {
-	
+void Game::CreateBackBuffer() {
+	HRESULT res;
+	D3D11_TEXTURE2D_DESC depthTexDesc = {};
+	depthTexDesc.ArraySize = 1;
+	depthTexDesc.MipLevels = 1;
+	depthTexDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	depthTexDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL;
+	depthTexDesc.CPUAccessFlags = 0;
+	depthTexDesc.MiscFlags = 0;
+	depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
+	depthTexDesc.Width = Display->ScreenWidth;
+	depthTexDesc.Height = Display->ScreenHeight;
+	depthTexDesc.SampleDesc = { 1,0 };
+	res = Device->CreateTexture2D(&depthTexDesc, nullptr, &_depthBuffer);
+	if (FAILED(res)) return;
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilDesc = {};
+	depthStencilDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	depthStencilDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	depthStencilDesc.Flags = 0;
+	res = Device->CreateDepthStencilView(_depthBuffer, &depthStencilDesc, &DepthStencilView); if (FAILED(res)) return;
+
+
+}
+void Game::RestoreTargets() {	
+	Context->OMSetRenderTargets(1, &RenderView, DepthStencilView);
+	D3D11_VIEWPORT viewport = {};
+	viewport.Width = static_cast<float>(Display->ScreenWidth);
+	viewport.Height = static_cast<float>(Display->ScreenHeight);
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.MinDepth = 0;
+	viewport.MaxDepth = 1.0f;
+	Context->RSSetViewports(1, &viewport);
 
 }
 void Game::Exit() {
@@ -189,6 +222,7 @@ int Game::Draw(HWND hWnd) {
 
 	Context->OMSetRenderTargets(1, &RenderView, nullptr);
 	Context->ClearRenderTargetView(RenderView, color);
+	//Context->ClearDepthStencilView(DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0.0f);
 	tGame->Update(deltaTime);
 	
 	return 0;

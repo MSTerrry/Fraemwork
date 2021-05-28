@@ -1,6 +1,6 @@
 #pragma once
 #include "wincodec.h"
-
+#include <d3d11.h>
 class TextureLoader
 {
 	IWICImagingFactory2* factory;
