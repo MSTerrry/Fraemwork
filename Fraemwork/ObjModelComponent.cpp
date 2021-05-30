@@ -37,7 +37,6 @@ HRESULT ObjModelComponent::CreateShader(LPCWSTR fileName, LPCSTR entryPoint, LPC
 }
 HRESULT ObjModelComponent::Initialize() {
 	HRESULT res;
-	//MiniTri.fx
 	res = CreateShader(L"ObjModelShader.hlsl", "VSMain", "vs_5_0", &VertexShaderByteCode, nullptr);
 	if (FAILED(res)) return res;
 
@@ -46,15 +45,19 @@ HRESULT ObjModelComponent::Initialize() {
 
 	D3D11_INPUT_ELEMENT_DESC inputElements[] = {
 		D3D11_INPUT_ELEMENT_DESC { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		D3D11_INPUT_ELEMENT_DESC { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0}
+		D3D11_INPUT_ELEMENT_DESC { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0},
+		D3D11_INPUT_ELEMENT_DESC { "NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0},
+		D3D11_INPUT_ELEMENT_DESC { "BINORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0},
+		D3D11_INPUT_ELEMENT_DESC { "TANGENT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0},
+		D3D11_INPUT_ELEMENT_DESC { "TEXTCOORD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 	res = Device->CreateVertexShader(VertexShaderByteCode->GetBufferPointer(), VertexShaderByteCode->GetBufferSize(), nullptr, &vertexShader);
 	if (FAILED(res)) return res;
 	res = Device->CreatePixelShader(PixelShaderByteCode->GetBufferPointer(), PixelShaderByteCode->GetBufferSize(), nullptr, &pixelShader);
 	if (FAILED(res)) return res;
 
-	//layout = VertexPositionNormalBinormalTangentColorTex::GetLayout(VertexShaderByteCode);
-	//objLoader->LoadObjModel(modelName, vertices, elemCount);	
+	res = Device->CreateInputLayout(inputElements, 6, VertexShaderByteCode->GetBufferPointer(), VertexShaderByteCode->GetBufferSize(),&layout);
+	//objLoader->LoadObjModel(modelName, vertices, elemCount);
 	
 
 	D3D11_BUFFER_DESC constBufDesc = {};
@@ -102,7 +105,7 @@ void ObjModelComponent::Update(float deltaTime) {
 }
 void ObjModelComponent::Draw(float deltaTime) {
 	ID3D11RasterizerState* oldState;
-	const UINT stride = 0;//VertexPositionNormalBinormalTangentColorTex::Stride;
+	const UINT stride = 96;
 	const UINT offset = 0;
 
 	Context->RSGetState(&oldState);

@@ -22,10 +22,10 @@ HRESULT TextureLoader::LoadTextureFromFile(LPCWSTR fileName, ID3D11Texture2D*& t
 	//factory->CreateStream(&pIWICStream);
 	//
 	//pIWICStream->InitializeFromFilename(fileName, GENERIC_READ);
-
+	HRESULT res;
 	IWICBitmapDecoder* decoder;
 
-	factory->CreateDecoderFromFilename(fileName, 0, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &decoder);
+	res = factory->CreateDecoderFromFilename(fileName, 0, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &decoder);
 
 	IWICBitmapFrameDecode* frame;
 	auto hr = decoder->GetFrame(frameIndex, &frame);

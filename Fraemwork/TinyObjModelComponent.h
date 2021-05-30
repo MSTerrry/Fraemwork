@@ -1,11 +1,9 @@
 #pragma once
 #include "GameComponent.h"
-#include "TextureLoader.h"
-#include "tiny_obj_loader.h"
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include "SimpleMath.h"
-#include "tiny_obj_loader.h"
+#include "ObjLoader.h"
 #include <vector>
 class TinyObjModelComponent:public GameComponent
 {
@@ -29,16 +27,16 @@ class TinyObjModelComponent:public GameComponent
 	ID3D11BlendState* blendState = nullptr;
 	ID3D11SamplerState* sampler = nullptr;
 	
-	UINT elemCount;
+	int elemCount = 0;
 	ID3D11Buffer* vBuf = nullptr;
 	ID3D11Buffer* nBuf = nullptr;
 	ID3D11Buffer* tBuf = nullptr;
 	ID3D11Buffer* strBuf = nullptr;
-	std::vector<tinyobj::material_t> Materials;
-	std::vector<tinyobj::shape_t> Shapes;
+	TinyMaterial* Materials = nullptr;
+	TinyShape* Shapes = nullptr;
 	DirectX::SimpleMath::Matrix Transform;
-
-	TextureLoader* texLoader = nullptr;
+	
+	ObjLoader* objLoader = nullptr;
 
 	const char* modelName;
 

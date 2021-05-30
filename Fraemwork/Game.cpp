@@ -76,7 +76,7 @@ void Game::Initialize()
 		DestroyResources();
 		return;
 	}	
-	//CreateBackBuffer();
+	CreateBackBuffer();
 }
 
 void Game::Run() {
@@ -172,7 +172,7 @@ void Game::CreateBackBuffer() {
 	D3D11_TEXTURE2D_DESC depthTexDesc = {};
 	depthTexDesc.ArraySize = 1;
 	depthTexDesc.MipLevels = 1;
-	depthTexDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	depthTexDesc.Format = DXGI_FORMAT_R32_TYPELESS;
 	depthTexDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL;
 	depthTexDesc.CPUAccessFlags = 0;
 	depthTexDesc.MiscFlags = 0;

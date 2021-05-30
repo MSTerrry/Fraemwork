@@ -11,6 +11,7 @@ ConstDataBuf data = { };
 TinyObjModelComponent::TinyObjModelComponent(ID3D11Device* device, ID3D11DeviceContext* context, Camera* camera, const char* fileName):device(device),context(context),camera(camera)
 {
 	modelName = fileName;
+	objLoader = new ObjLoader(device,context);
 }
 HRESULT TinyObjModelComponent::CreateShader(LPCWSTR fileName, LPCSTR entryPoint, LPCSTR shaderModel, ID3DBlob** vertexBC, D3D_SHADER_MACRO* shaderMacros) {
 	HRESULT res;
@@ -45,17 +46,25 @@ HRESULT TinyObjModelComponent::Initialize() {
 	res = CreateShader(L"TinyModelShader.hlsl", "PSMain", "ps_5_0", &PixelShaderByteCode, nullptr);
 	if (FAILED(res)) return res;
 
-	D3D11_INPUT_ELEMENT_DESC inputElements[] = {
+	/*D3D11_INPUT_ELEMENT_DESC inputElements[] = {
 		D3D11_INPUT_ELEMENT_DESC { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		D3D11_INPUT_ELEMENT_DESC { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0}
-	};
+	};*/
 	res = device->CreateVertexShader(VertexShaderByteCode->GetBufferPointer(), VertexShaderByteCode->GetBufferSize(), nullptr, &vertexShader);
 	if (FAILED(res)) return res;
 	res = device->CreatePixelShader(PixelShaderByteCode->GetBufferPointer(), PixelShaderByteCode->GetBufferSize(), nullptr, &pixelShader);
-	if (FAILED(res)) return res;
+	if (FAILED(res)) return res;	
 	
-	
-	//ObjLoader->LoadTinyModel(modelName, vBuf, nBuf, tBuf, strBuf, Materials, Shapes, elemCount);
+	objLoader->LoadTinyModel(modelName, vBuf, nBuf, tBuf, strBuf, Shapes, Materials, elemCount);
+
+	D3D11_INPUT_ELEMENT_DESC inputElements[] = {
+		D3D11_INPUT_ELEMENT_DESC { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		D3D11_INPUT_ELEMENT_DESC { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0},
+		D3D11_INPUT_ELEMENT_DESC { "NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0},
+		D3D11_INPUT_ELEMENT_DESC { "BINORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0},
+		D3D11_INPUT_ELEMENT_DESC { "TANGENT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0},
+		D3D11_INPUT_ELEMENT_DESC { "TEXTCOORD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0}
+	};
 	D3D11_BUFFER_DESC descBuf = {};
 	vBuf->GetDesc(&descBuf);
 
@@ -133,7 +142,7 @@ HRESULT TinyObjModelComponent::Initialize() {
 	int totalCount = 0;
 	for (int i = 0; i < elemCount; i++)
 	{
-		//totalCount += Shapes[i].Count;
+		totalCount += Shapes[i].Count;
 	}
 
 	int* indexes = new int[totalCount];
@@ -161,6 +170,7 @@ HRESULT TinyObjModelComponent::Initialize() {
 
 void TinyObjModelComponent::Update(float deltaTime) {
 
+	//auto world = Matrix::CreateTranslation(Position) * camera->ViewMatrix * camera->ProjMatrix;
 	auto world = Transform * Matrix::CreateTranslation(Position);
 	auto proj = world * camera->GetCameraMatrix();
 
@@ -183,16 +193,17 @@ void TinyObjModelComponent::Draw(float deltaTime) {
 	ID3D11ShaderResourceView* srvs[] = {vSrv,nSrv,tSrv,strSrv};
 	context->VSSetShaderResources(0, 4, srvs);
 
-	context->VSSetConstantBuffers(0, 1, &constantBuffer);
-	//context->PSSetShaderResources(0, 1, &sampler);
+	context->VSSetConstantBuffers(0, 1, &constantBuffer);	
 	context->PSSetSamplers(0, 1, &sampler);
 	for (int i = 0; i < elemCount; i++)
 	{
 		auto shape = Shapes[i];
-		auto material = Materials[i];
 		
-		//context->PSSetShaderResources(0, 1, &material.DiffSrv);
-		//context->DrawIndexed(shape.Count, shape.StartIndex, 0);
+		auto material = Materials[shape.MaterialInd];
+		
+		context->PSSetShaderResources(0, 1, &material.ResourceView);
+		context->DrawIndexed(shape.Count, shape.StartIndex, 0);
+		//context->Draw(shape.Count,0);
 	}
 	context->RSSetState(oldState);
 	if (oldState)

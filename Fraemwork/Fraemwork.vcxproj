@@ -148,6 +148,7 @@
     <ClCompile Include="LightTextureGame.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="DisplayWin32.cpp" />
+    <ClCompile Include="ObjLoader.cpp" />
     <ClCompile Include="ObjModelComponent.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="PlaneComponent.cpp" />
@@ -171,7 +172,6 @@
     <ClInclude Include="PlaneComponent.h" />
     <ClInclude Include="TextureLoader.h" />
     <ClInclude Include="TinyObjModelComponent.h" />
-    <ClInclude Include="tiny_obj_loader.h" />
     <ClInclude Include="TransformGame.h" />
     <ClInclude Include="TriangleComponent.h" />
     <ClInclude Include="DisplayWin32.h" />
@@ -195,7 +195,9 @@
     </FxCompile>
     <FxCompile Include="TinyModelShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VSMain</EntryPointName>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
@@ -205,6 +207,7 @@
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\Microsoft.XAudio2.Redist.1.2.4\build\native\Microsoft.XAudio2.Redist.targets" Condition="Exists('..\packages\Microsoft.XAudio2.Redist.1.2.4\build\native\Microsoft.XAudio2.Redist.targets')" />
     <Import Project="..\packages\directxtk_desktop_2017.2021.4.7.2\build\native\directxtk_desktop_2017.targets" Condition="Exists('..\packages\directxtk_desktop_2017.2021.4.7.2\build\native\directxtk_desktop_2017.targets')" />
+    <Import Project="..\packages\directxmesh_desktop_win10.2021.4.7.2\build\native\directxmesh_desktop_win10.targets" Condition="Exists('..\packages\directxmesh_desktop_win10.2021.4.7.2\build\native\directxmesh_desktop_win10.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -212,5 +215,6 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.XAudio2.Redist.1.2.4\build\native\Microsoft.XAudio2.Redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.XAudio2.Redist.1.2.4\build\native\Microsoft.XAudio2.Redist.targets'))" />
     <Error Condition="!Exists('..\packages\directxtk_desktop_2017.2021.4.7.2\build\native\directxtk_desktop_2017.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_2017.2021.4.7.2\build\native\directxtk_desktop_2017.targets'))" />
+    <Error Condition="!Exists('..\packages\directxmesh_desktop_win10.2021.4.7.2\build\native\directxmesh_desktop_win10.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxmesh_desktop_win10.2021.4.7.2\build\native\directxmesh_desktop_win10.targets'))" />
   </Target>
 </Project>

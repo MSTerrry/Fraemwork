@@ -1,8 +1,6 @@
 struct ConstantData 
 {
 	float4x4 WorldViewProj;
-	float4x4 World;
-	float4 ClipPlane;
 };
 
 cbuffer ConstBuf:register(b0) 
@@ -31,7 +29,7 @@ Buffer<float3> Normals : register(t1);
 Buffer<float3> TexCoords : register(t2);
 StructuredBuffer<Inds> Indexes : register(t3);
 
-PS_IN VSMain(uint index:SV_VertexID)
+PS_IN VSMain(uint index : SV_VertexID)
 {
 	PS_IN output = (PS_IN)0;
 

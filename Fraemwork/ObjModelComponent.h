@@ -5,7 +5,7 @@
 #include "SimpleMath.h"
 #include<d3dcompiler.h>
 #include "GameComponent.h"
-#include "tiny_obj_loader.h"
+#include "ObjLoader.h"
 
 class ObjModelComponent:public GameComponent {
 	Camera* Cam = nullptr;
@@ -28,8 +28,9 @@ class ObjModelComponent:public GameComponent {
 	DirectX::SimpleMath::Vector4 ClipPlane;
 
 	TextureLoader* texLoader = nullptr;
+	ObjLoader* objLoader = nullptr;
 	ID3D11SamplerState* sampler = nullptr;
-	UINT elemCount;
+	int elemCount;
 
 	HRESULT CreateShader(LPCWSTR fileName, LPCSTR entryPoint, LPCSTR shaderModel, ID3DBlob** vertexBC, D3D_SHADER_MACRO* shaderMacros);
 public:
