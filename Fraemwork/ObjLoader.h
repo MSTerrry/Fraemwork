@@ -28,5 +28,5 @@ public:
 	ObjLoader(ID3D11Device* dev, ID3D11DeviceContext* context);
 	void LoadTinyModel(const char* fileName, ID3D11Buffer*& vBuf, ID3D11Buffer*& nBuf, ID3D11Buffer*& tBuf,
 		ID3D11Buffer*& strBuf, TinyShape*& outShapes, TinyMaterial*& outMaterials, int& elemCount);
-	void LoadObjModel(LPCWSTR fileName,ID3D11Buffer*& vertices, int& elemCount);
+	void LoadObjModel(const char* fileName,ID3D11Buffer*& vertices, int& elemCount);
 };

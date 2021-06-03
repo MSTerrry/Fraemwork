@@ -25,16 +25,18 @@ class ObjModelComponent:public GameComponent {
 	ID3D11Texture2D* texture;
 	DirectX::SimpleMath::Vector3 Position;
 	DirectX::SimpleMath::Matrix Transform;
-	DirectX::SimpleMath::Vector4 ClipPlane;
+	
 
 	TextureLoader* texLoader = nullptr;
 	ObjLoader* objLoader = nullptr;
 	ID3D11SamplerState* sampler = nullptr;
 	int elemCount;
+	const char* modelName;
 
 	HRESULT CreateShader(LPCWSTR fileName, LPCSTR entryPoint, LPCSTR shaderModel, ID3DBlob** vertexBC, D3D_SHADER_MACRO* shaderMacros);
 public:
-	ObjModelComponent(ID3D11Device* Device, ID3D11DeviceContext* Context, LPCWSTR inFileName,LPCWSTR inTextureName, Camera* camera);
+	DirectX::SimpleMath::Vector4 ClipPlane;
+	ObjModelComponent(ID3D11Device* Device, ID3D11DeviceContext* Context, const char* inFileName,LPCWSTR inTextureName, Camera* camera);
 	virtual HRESULT Initialize();
 	virtual void Reload();
 	virtual void Update(float deltaTime);
