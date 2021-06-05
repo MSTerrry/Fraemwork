@@ -5,7 +5,7 @@ CameraController::CameraController(InputDevice* inDev,Camera* camera):camera(cam
 	Yaw = 0;
 	Pitch = 0;
 	CameraController& cont = *this;
-	CameraPosition = DirectX::SimpleMath::Vector3(1, 1, 1);
+	CameraPosition = DirectX::SimpleMath::Vector3(0, 1, 10);
 	inputDevice->MouseMove.AddRaw(this, &CameraController::OnMouseMove);
 }
 

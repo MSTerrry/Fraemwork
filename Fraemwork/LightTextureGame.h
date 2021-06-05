@@ -4,6 +4,7 @@
 #include "PlaneComponent.h"
 #include "ObjModelComponent.h"
 #include "TinyObjModelComponent.h"
+#include "LightTexturedComponent.h"
 class LightTextureGame : public Game
 {
 public:

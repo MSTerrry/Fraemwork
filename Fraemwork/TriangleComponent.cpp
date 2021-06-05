@@ -8,7 +8,7 @@ void TriangleComponent :: DestroyResources() {
 
 TriangleComponent::TriangleComponent(ID3D11Device* device, ID3D11DeviceContext* context, Camera* camera):device(device),context(context),camera(camera)
 {	
-	position = Vector3::Zero;
+	position = Vector3(5,0,5);
 }
 
 void TriangleComponent::Draw(float deltaTime) {
@@ -144,7 +144,7 @@ HRESULT TriangleComponent::Initialize() {
 
 	
 	CD3D11_RASTERIZER_DESC rastDesc = {};
-	rastDesc.CullMode = D3D11_CULL_NONE; //D3D11_CULL_NONE
+	rastDesc.CullMode = D3D11_CULL_BACK; //D3D11_CULL_NONE
 	rastDesc.FillMode = D3D11_FILL_SOLID;
 
 	res = device->CreateRasterizerState(&rastDesc, &rastState);

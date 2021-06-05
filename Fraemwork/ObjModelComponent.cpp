@@ -65,9 +65,9 @@ HRESULT ObjModelComponent::Initialize() {
 	
 
 	D3D11_BUFFER_DESC constBufDesc = {};
-	constBufDesc.Usage = D3D11_USAGE_DYNAMIC;
+	constBufDesc.Usage = D3D11_USAGE_DEFAULT;
 	constBufDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	constBufDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	constBufDesc.CPUAccessFlags = 0;
 	constBufDesc.MiscFlags = 0;
 	constBufDesc.StructureByteStride = 0;
 	constBufDesc.ByteWidth = sizeof(ConstantData);

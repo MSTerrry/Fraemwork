@@ -71,12 +71,11 @@ void Game::Initialize()
 	if (!Display->hWnd) {
 		DestroyResources();
 		return;
-	}	
+	}		
 	if (FAILED(PrepareResources())) {
 		DestroyResources();
 		return;
-	}	
-	CreateBackBuffer();
+	}		
 }
 
 void Game::Run() {
@@ -129,7 +128,7 @@ HRESULT Game::PrepareResources() {
 	swapDesc.SampleDesc.Count = 1;
 	swapDesc.SampleDesc.Quality = 0;
 
-	D3D_FEATURE_LEVEL featureLevel[] = { D3D_FEATURE_LEVEL_11_1 };
+	D3D_FEATURE_LEVEL featureLevel[] = { D3D_FEATURE_LEVEL_11_0 };
 	res = D3D11CreateDeviceAndSwapChain(
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
@@ -153,7 +152,7 @@ HRESULT Game::PrepareResources() {
 	swapChain->QueryInterface<IDXGISwapChain1>(&swapChain1);
 	Context->QueryInterface(IID_ID3DUserDefinedAnnotation, (void**)&DebugAnnotation);
 	Device->QueryInterface(IID_ID3D11Debug, (void**)&_debug);
-
+	CreateBackBuffer();
 	D3D11_VIEWPORT viewport = {};
 	viewport.Width = static_cast<float>(Display->ScreenWidth);
 	viewport.Height = static_cast<float>(Display->ScreenHeight);
@@ -222,7 +221,7 @@ int Game::Draw(HWND hWnd) {
 
 	Context->OMSetRenderTargets(1, &RenderView, nullptr);
 	Context->ClearRenderTargetView(RenderView, color);
-	//Context->ClearDepthStencilView(DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0.0f);
+	Context->ClearDepthStencilView(DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0.0f);
 	tGame->Update(deltaTime);
 	
 	return 0;
