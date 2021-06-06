@@ -6,6 +6,9 @@ PlaneComponent::PlaneComponent(ID3D11Device* device, ID3D11DeviceContext* contex
 	position = Vector3::Zero;
 	amount = 200;
 	points = new Vector4[amount];
+	if (FAILED(Initialize())) {
+		DestroyResources();
+	}
 }
 
 
@@ -65,20 +68,18 @@ int PlaneComponent::FillLines(int startAmount, int endAmount, int indexInArray) 
 
 HRESULT PlaneComponent::Initialize() {
 	HRESULT res;
-	res = CreateShader(L"Simple.hlsl", "VSMain", "vs_5_0", &VertexShaderByteCode, nullptr);
-	if (FAILED(res)) return res;	
+	res = CreateShader(L"Simple.hlsl", "VSMain", "vs_5_0", &VertexShaderByteCode, nullptr); ZCHECK(res);
 	
-	res = CreateShader(L"Simple.hlsl", "PSMain", "ps_5_0", &PixelShaderByteCode, nullptr);
-	if (FAILED(res)) return res;
+	res = CreateShader(L"Simple.hlsl", "PSMain", "ps_5_0", &PixelShaderByteCode, nullptr); ZCHECK(res);
 
 	D3D11_INPUT_ELEMENT_DESC inputElements[] = {
 		D3D11_INPUT_ELEMENT_DESC { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		D3D11_INPUT_ELEMENT_DESC { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
-	res = device->CreateVertexShader(VertexShaderByteCode->GetBufferPointer(), VertexShaderByteCode->GetBufferSize(), nullptr, &vertexShader);
-	res = device->CreatePixelShader(PixelShaderByteCode->GetBufferPointer(), PixelShaderByteCode->GetBufferSize(), nullptr, &pixelShader);
+	res = device->CreateVertexShader(VertexShaderByteCode->GetBufferPointer(), VertexShaderByteCode->GetBufferSize(), nullptr, &vertexShader); ZCHECK(res);
+	res = device->CreatePixelShader(PixelShaderByteCode->GetBufferPointer(), PixelShaderByteCode->GetBufferSize(), nullptr, &pixelShader); ZCHECK(res);
 
-	res = device->CreateInputLayout(inputElements, 2, VertexShaderByteCode->GetBufferPointer(), VertexShaderByteCode->GetBufferSize(), &layout);
+	res = device->CreateInputLayout(inputElements, 2, VertexShaderByteCode->GetBufferPointer(), VertexShaderByteCode->GetBufferSize(), &layout); ZCHECK(res);
 	
 	auto k = 0;
 	k = FillLines(0, 0, 0);
@@ -97,7 +98,7 @@ HRESULT PlaneComponent::Initialize() {
 	vertexData.SysMemPitch = 0;
 	vertexData.SysMemSlicePitch = 0;
 
-	res = device->CreateBuffer(&vertexBufDesc, &vertexData, &vertices);
+	res = device->CreateBuffer(&vertexBufDesc, &vertexData, &vertices); ZCHECK(res);
 
 
 	D3D11_BUFFER_DESC constBufDesc = {};
@@ -107,15 +108,15 @@ HRESULT PlaneComponent::Initialize() {
 	constBufDesc.MiscFlags = 0;
 	constBufDesc.StructureByteStride = 0;
 	constBufDesc.ByteWidth = sizeof(Matrix);
-	res = device->CreateBuffer(&constBufDesc, nullptr, &constantBuffer);
+	res = device->CreateBuffer(&constBufDesc, nullptr, &constantBuffer); ZCHECK(res);
 
 
 	CD3D11_RASTERIZER_DESC rastDesc = {};
-	rastDesc.CullMode = D3D11_CULL_NONE; //D3D11_CULL_NONE
+	rastDesc.CullMode = D3D11_CULL_NONE;
 	rastDesc.FillMode = D3D11_FILL_SOLID;
 
-	res = device->CreateRasterizerState(&rastDesc, &rastState);
-	res = context->QueryInterface(IID_ID3DUserDefinedAnnotation, (void**)&annotation);
+	res = device->CreateRasterizerState(&rastDesc, &rastState); ZCHECK(res);
+	res = context->QueryInterface(IID_ID3DUserDefinedAnnotation, (void**)&annotation); ZCHECK(res);
 
 	return res;
 }
@@ -145,6 +146,10 @@ HRESULT PlaneComponent::CreateShader(LPCWSTR fileName, LPCSTR entryPoint, LPCSTR
 }
 
 void PlaneComponent::DestroyResources() {
+	if (annotation) annotation->Release();
+	if (rastState) rastState->Release();
+	if (constantBuffer) constantBuffer->Release();
+	if (vertices) vertices->Release();
 	if (layout) layout->Release();
 	if (vertexShader) vertexShader->Release();
 	if (pixelShader) pixelShader->Release();

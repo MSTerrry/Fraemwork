@@ -1,10 +1,6 @@
 #pragma once
-#include "GameComponent.h"
-#include "Camera.h"
-#include <DirectXMath.h>
-#include "SimpleMath.h"
+#include "Libs.h"
 #include "TextureLoader.h"
-#include <iostream>
 using namespace DirectX::SimpleMath;
 class LightTexturedComponent :public GameComponent
 {

@@ -81,10 +81,7 @@ void Game::Initialize()
 void Game::Run() {
 	MSG msg = {};
 
-	// Loop until there is a quit message from the window or the user.
-	
 	while (!isExitRequested) {
-		// Handle the windows messages.
 		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 
 			TranslateMessage(&msg);
@@ -110,6 +107,27 @@ void Game::Update(float deltaTime) {
 	swapChain1->Present(1, 0);
 }
 HRESULT Game::PrepareResources() {
+	HRESULT res;
+	res = CreateBackBuffer(); ZCHECK(res);
+	ID3D11Texture2D* backTex;
+	res = swapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)&backTex);	ZCHECK(res);
+	res = Device->CreateRenderTargetView(backTex, nullptr, &RenderView); ZCHECK(res);
+	res = swapChain->QueryInterface<IDXGISwapChain1>(&swapChain1); ZCHECK(res);
+	Context->QueryInterface(IID_ID3DUserDefinedAnnotation, (void**)&DebugAnnotation);
+	Device->QueryInterface(IID_ID3D11Debug, (void**)&_debug);	
+	D3D11_VIEWPORT viewport = {};
+	viewport.Width = static_cast<float>(Display->ScreenWidth);
+	viewport.Height = static_cast<float>(Display->ScreenHeight);
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.MinDepth = 0;
+	viewport.MaxDepth = 1.0f;
+	Context->RSSetViewports(1, &viewport);
+	Context->OMSetRenderTargets(1, &RenderView, DepthStencilView);
+
+	return res;
+}
+HRESULT Game::CreateBackBuffer() {
 	HRESULT res;
 	DXGI_SWAP_CHAIN_DESC swapDesc = {};
 	swapDesc.BufferCount = 2;
@@ -143,31 +161,7 @@ HRESULT Game::PrepareResources() {
 		nullptr,
 		&Context);
 	ZCHECK(res);
-	if (FAILED(res)) return res;
-	ID3D11Texture2D* backTex;
-	res = swapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)&backTex);	ZCHECK(res);
-	if (FAILED(res)) return res;
-	res = Device->CreateRenderTargetView(backTex, nullptr, &RenderView);			ZCHECK(res);
-	if (FAILED(res)) return res;
-	swapChain->QueryInterface<IDXGISwapChain1>(&swapChain1);
-	Context->QueryInterface(IID_ID3DUserDefinedAnnotation, (void**)&DebugAnnotation);
-	Device->QueryInterface(IID_ID3D11Debug, (void**)&_debug);
-	CreateBackBuffer();
-	D3D11_VIEWPORT viewport = {};
-	viewport.Width = static_cast<float>(Display->ScreenWidth);
-	viewport.Height = static_cast<float>(Display->ScreenHeight);
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.MinDepth = 0;
-	viewport.MaxDepth = 1.0f;
 
-	Context->RSSetViewports(1, &viewport);
-	Context->OMSetRenderTargets(1, &RenderView, DepthStencilView);
-
-	return res;
-}
-void Game::CreateBackBuffer() {
-	HRESULT res;
 	D3D11_TEXTURE2D_DESC depthTexDesc = {};
 	depthTexDesc.ArraySize = 1;
 	depthTexDesc.MipLevels = 1;
@@ -179,16 +173,14 @@ void Game::CreateBackBuffer() {
 	depthTexDesc.Width = Display->ScreenWidth;
 	depthTexDesc.Height = Display->ScreenHeight;
 	depthTexDesc.SampleDesc = { 1,0 };
-	res = Device->CreateTexture2D(&depthTexDesc, nullptr, &_depthBuffer);
-	if (FAILED(res)) return;
+	res = Device->CreateTexture2D(&depthTexDesc, nullptr, &_depthBuffer); ZCHECK(res);
 
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilDesc = {};
 	depthStencilDesc.Format = DXGI_FORMAT_D32_FLOAT;
 	depthStencilDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	depthStencilDesc.Flags = 0;
-	res = Device->CreateDepthStencilView(_depthBuffer, &depthStencilDesc, &DepthStencilView); if (FAILED(res)) return;
-
-
+	res = Device->CreateDepthStencilView(_depthBuffer, &depthStencilDesc, &DepthStencilView); ZCHECK(res);
+	return res;
 }
 void Game::RestoreTargets() {	
 	Context->OMSetRenderTargets(1, &RenderView, DepthStencilView);

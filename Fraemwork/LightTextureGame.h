@@ -2,16 +2,12 @@
 #include "Game.h"
 #include "CameraController.h"
 #include "PlaneComponent.h"
-#include "ObjModelComponent.h"
-#include "TinyObjModelComponent.h"
 #include "LightTexturedComponent.h"
 class LightTextureGame : public Game
 {
 public:
 	Camera* cam = nullptr;
-	CameraController* camController = nullptr;
-	TriangleComponent* tri;
-	PlaneComponent* pc;
+	CameraController* camController = nullptr;	
 	LightTextureGame(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow) :Game(hInstance, hPrevInstance, pScmdline, iCmdshow)
 	{
 		tGame = this;

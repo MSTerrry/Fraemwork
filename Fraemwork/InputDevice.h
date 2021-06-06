@@ -1,11 +1,9 @@
 #pragma once
 
 #include <unordered_set>
-#include "Keys.h"
 #include "Delegates.h"
 #include "DisplayWin32.h"
-#include <directxmath.h>
-#include "SimpleMath.h"
+#include "Libs.h"
 
 class InputDevice
 {	

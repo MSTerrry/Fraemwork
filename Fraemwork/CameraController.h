@@ -1,9 +1,6 @@
 #pragma once
+#include "Libs.h"
 #include "InputDevice.h"
-#include "Camera.h"
-#include <directxmath.h>
-#include "SimpleMath.h"
-#include "Keys.h"
 using namespace DirectX::SimpleMath;
 class CameraController {
 	InputDevice* inputDevice;

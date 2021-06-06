@@ -4,10 +4,8 @@ void TransformGame::Initialize() {
 	cam = new Camera(Display);
 	InDevice = new InputDevice(Display);
 	camController = new CameraController(InDevice, cam);
-	pc = new PlaneComponent(Device, Context, cam);
-	pc->Initialize();	
-	tri = new TriangleComponent(Device, Context, cam);
-	tri->Initialize();
+	auto pc = new PlaneComponent(Device, Context, cam);	
+	auto tri = new TriangleComponent(Device, Context, cam);	
 	Components.push_back(pc);
 	Components.push_back(tri);
 }

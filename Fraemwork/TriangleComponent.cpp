@@ -9,6 +9,7 @@ void TriangleComponent :: DestroyResources() {
 TriangleComponent::TriangleComponent(ID3D11Device* device, ID3D11DeviceContext* context, Camera* camera):device(device),context(context),camera(camera)
 {	
 	position = Vector3(5,0,5);
+	Initialize();
 }
 
 void TriangleComponent::Draw(float deltaTime) {

@@ -8,7 +8,6 @@ struct ConstantData {
 
 struct LightData {
 	Vector4 Direction;
-	Vector4 Color;
 	Vector4 KaSpecPowKsX;
 };
 
@@ -16,16 +15,21 @@ LightTexturedComponent::LightTexturedComponent(ID3D11Device* device, ID3D11Devic
 	textureName = inTexName;
 	texLoader = new TextureLoader(device, context);
 	position = Vector3(0,0,0);
+	Initialize();
 }
 void LightTexturedComponent::DestroyResources() {
+	if (sampler) sampler->Release();
 	if (texSrv) texSrv->Release();
 	if (rastState) rastState->Release();
+	if (lightBuffer) lightBuffer->Release();
+	if (constantBuffer) constantBuffer->Release();
+	if (indexBuffer) indexBuffer->Release();
+	if (vertices) vertices->Release();
 	if (layout) layout->Release();
 	if (vertexShader) vertexShader->Release();
 	if (VertexShaderByteCode) VertexShaderByteCode->Release();
 	if (pixelShader) pixelShader->Release();
-	if (PixelShaderByteCode) PixelShaderByteCode->Release();
-	if (vertices) vertices->Release();
+	if (PixelShaderByteCode) PixelShaderByteCode->Release();	
 }
 void LightTexturedComponent::Draw(float deltaTime) {
 	UINT strides = 48;
@@ -59,56 +63,40 @@ HRESULT LightTexturedComponent::Initialize() {
 
 	D3D11_INPUT_ELEMENT_DESC inputElements[] = {
 		D3D11_INPUT_ELEMENT_DESC { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		//D3D11_INPUT_ELEMENT_DESC { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0},		
 		D3D11_INPUT_ELEMENT_DESC { "NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0},
-		//D3D11_INPUT_ELEMENT_DESC { "BINORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0},
-		//D3D11_INPUT_ELEMENT_DESC { "TANGENT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0},
 		D3D11_INPUT_ELEMENT_DESC { "TEXTCOORD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 
-	res = device->CreateVertexShader(VertexShaderByteCode->GetBufferPointer(), VertexShaderByteCode->GetBufferSize(), nullptr, &vertexShader);
-	if (FAILED(res)) return res;
-	res = device->CreatePixelShader(PixelShaderByteCode->GetBufferPointer(), PixelShaderByteCode->GetBufferSize(), nullptr, &pixelShader);
-	if (FAILED(res)) return res;
+	res = device->CreateVertexShader(VertexShaderByteCode->GetBufferPointer(), VertexShaderByteCode->GetBufferSize(), nullptr, &vertexShader); ZCHECK(res);
+	res = device->CreatePixelShader(PixelShaderByteCode->GetBufferPointer(), PixelShaderByteCode->GetBufferSize(), nullptr, &pixelShader); ZCHECK(res);	
 
-	res = device->CreateInputLayout(inputElements, 3, VertexShaderByteCode->GetBufferPointer(), VertexShaderByteCode->GetBufferSize(), &layout);
-
-	//points = new Vector4[] {Vector4(1.5f, 1.5f, 1.5f, 1.0f),  Vector4(0.0f,1.0f,0.0f,1.0f), Vector4(1.0f, 0.0f, 0.0f, 0.0f),	//0
-	//	Vector4(-1.5f, -1.5f, 1.5f, 1.0f), Vector4(1.0f,1.0f,1.0f,1.0f),	Vector4(0.0f, 1.0f, 0.0f, 0.0f),	//1
-	//	Vector4(1.5f, -1.5f, 1.5f, 1.0f), Vector4(1.0f,1.0f,1.0f,1.0f), Vector4(1.0f, 1.0f, 0.0f, 0.0f),		//2
-	//	Vector4(-1.5f, 1.5f, 1.5f, 1.0f), Vector4(1.0f,1.0f,1.0f,1.0f), Vector4(0.0f, 0.0f, 0.0f, 0.0f),		//3
-	//	Vector4(1.5f, 1.5f, -1.5f, 1.0f), Vector4(1.0f,1.0f,1.0f,1.0f), Vector4(0.0f, 0.0f, 0.0f, 0.0f),		//4
-	//	Vector4(1.5f, -1.5f, -1.5f, 1.0f), Vector4(1.0f,1.0f,1.0f,1.0f), Vector4(0.0f, 1.0f, 0.0f, 0.0f),		//5
-	//	Vector4(-1.5f, 1.5f, -1.5f, 1.0f), Vector4(1.0f,1.0f,1.0f,1.0f), Vector4(1.0f, 0.0f, 0.0f, 0.0f),		//6
-	//	Vector4(-1.5f, -1.5f, -1.5f, 1.0f), Vector4(1.0f,1.0f,1.0f,1.0f), Vector4(1.0f, 1.0f, 0.0f, 0.0f),
-	//};		//7
-	//indeces = new int[] { 0,1,2, 1,0,3, 4,2,5, 2,4,0, 6,5,7, 5,6,4, 3,7,1, 7,3,6, 4,3,0, 3,4,6, 2,7,5, 7,2,1 };
+	res = device->CreateInputLayout(inputElements, 3, VertexShaderByteCode->GetBufferPointer(), VertexShaderByteCode->GetBufferSize(), &layout); ZCHECK(res);
 
 	points = new Vector4[]{
-		Vector4(-1.0f, 2.0f, -1.0f, 1.0f), Vector4(0.0f, 1.0f, 0.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f),
-		Vector4(1.0f, 2.0f, -1.0f, 1.0f),  Vector4(0.0f, 1.0f, 0.0f, 1.0f) ,Vector4(1.0f, 0.0f, 1.0f, 1.0f),
-		Vector4(1.0f, 2.0f, 1.0f, 1.0f), Vector4(0.0f, 1.0f, 0.0f, 1.0f),Vector4(1.0f, 1.0f, 1.0f, 1.0f),
-		Vector4(-1.0f, 2.0f, 1.0f, 1.0f), Vector4(0.0f, 1.0f, 0.0f, 1.0f),Vector4(0.0f, 1.0f, 1.0f, 1.0f),
-		Vector4(-1.0f, 0.0f, -1.0f, 1.0f),Vector4(0.0f, -1.0f, 0.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f),
-		Vector4(1.0f, 0.0f, -1.0f, 1.0f), Vector4(0.0f, -1.0f, 0.0f, 1.0f), Vector4(1.0f, 0.0f, 1.0f, 1.0f),
-		Vector4(1.0f, 0.0f, 1.0f, 1.0f), Vector4(0.0f, -1.0f, 0.0f, 1.0f), Vector4(1.0f, 1.0f, 1.0f, 1.0f),
-		Vector4(-1.0f, 0.0f, 1.0f, 1.0f), Vector4(0.0f, -1.0f, 0.0f, 1.0f), Vector4(0.0f, 1.0f, 1.0f, 1.0f),
-		Vector4(-1.0f, 0.0f, 1.0f, 1.0f), Vector4(-1.0f, 0.0f, 0.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f),
-		Vector4(-1.0f, 0.0f, -1.0f, 1.0f), Vector4(-1.0f, 0.0f, 0.0f, 1.0f), Vector4(1.0f, 0.0f, 1.0f, 1.0f),
-		Vector4(-1.0f, 2.0f, -1.0f, 1.0f), Vector4(-1.0f, 0.0f, 0.0f, 1.0f), Vector4(1.0f, 1.0f, 1.0f, 1.0f),
-		Vector4(-1.0f, 2.0f, 1.0f, 1.0f), Vector4(-1.0f, 0.0f, 0.0f, 1.0f) , Vector4(0.0f, 1.0f, 1.0f, 1.0f),
-		Vector4(1.0f, 0.0f, 1.0f, 1.0f), Vector4(1.0f, 0.0f, 0.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f),
-		Vector4(1.0f, 0.0f, -1.0f, 1.0f), Vector4(1.0f, 0.0f, 0.0f, 1.0f), Vector4(1.0f, 0.0f, 1.0f, 1.0f),
-		Vector4(1.0f, 2.0f, -1.0f, 1.0f), Vector4(1.0f, 0.0f, 0.0f, 1.0f), Vector4(1.0f, 1.0f, 1.0f, 1.0f),
-		Vector4(1.0f, 2.0f, 1.0f, 1.0f), Vector4(1.0f, 0.0f, 0.0f, 1.0f), Vector4(0.0f, 1.0f, 1.0f, 1.0f),
-		Vector4(-1.0f, 0.0f, -1.0f, 1.0f), Vector4(0.0f, 0.0f, -1.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f),
-		Vector4(1.0f, 0.0f, -1.0f, 1.0f), Vector4(0.0f, 0.0f, -1.0f, 1.0f), Vector4(1.0f, 0.0f, 1.0f, 1.0f),
-		Vector4(1.0f, 2.0f, -1.0f, 1.0f), Vector4(0.0f, 0.0f, -1.0f, 1.0f), Vector4(1.0f, 1.0f, 1.0f, 1.0f),
-		Vector4(-1.0f, 2.0f, -1.0f, 1.0f), Vector4(0.0f, 0.0f, -1.0f, 1.0f),  Vector4(0.0f, 1.0f, 1.0f, 1.0f),
-		Vector4(-1.0f, 0.0f, 1.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f),  Vector4(0.0f, 0.0f, 1.0f, 1.0f),
-		Vector4(1.0f, 0.0f, 1.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f), Vector4(1.0f, 0.0f, 1.0f, 1.0f),
-		Vector4(1.0f, 2.0f, 1.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f),  Vector4(1.0f, 1.0f, 1.0f, 1.0f),
-		Vector4(-1.0f, 2.0f, 1.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f), Vector4(0.0f, 1.0f, 1.0f, 1.0f) };
+		Vector4(-1.0f, 1.0f, -1.0f, 1.0f), Vector4(0.0f, 1.0f, 0.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f),
+		Vector4(1.0f, 1.0f, -1.0f, 1.0f),  Vector4(0.0f, 1.0f, 0.0f, 1.0f) ,Vector4(1.0f, 0.0f, 1.0f, 1.0f),
+		Vector4(1.0f, 1.0f, 1.0f, 1.0f), Vector4(0.0f, 1.0f, 0.0f, 1.0f),Vector4(1.0f, 1.0f, 1.0f, 1.0f),
+		Vector4(-1.0f, 1.0f, 1.0f, 1.0f), Vector4(0.0f, 1.0f, 0.0f, 1.0f),Vector4(0.0f, 1.0f, 1.0f, 1.0f),
+		Vector4(-1.0f, -1.0f, -1.0f, 1.0f),Vector4(0.0f, -1.0f, 0.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f),
+		Vector4(1.0f, -1.0f, -1.0f , 1.0f), Vector4(0.0f, -1.0f, 0.0f, 1.0f), Vector4(1.0f, 0.0f, 1.0f, 1.0f),
+		Vector4(1.0f, -1.0f, 1.0f , 1.0f), Vector4(0.0f, -1.0f, 0.0f, 1.0f), Vector4(1.0f, 1.0f, 1.0f, 1.0f),
+		Vector4(-1.0f, -1.0f, 1.0f, 1.0f), Vector4(0.0f, -1.0f, 0.0f, 1.0f), Vector4(0.0f, 1.0f, 1.0f, 1.0f),
+		Vector4(-1.0f, -1.0f, 1.0f, 1.0f), Vector4(-1.0f, 0.0f, 0.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f),
+		Vector4(-1.0f, -1.0f, -1.0f, 1.0f), Vector4(-1.0f, 0.0f, 0.0f, 1.0f), Vector4(1.0f, 0.0f, 1.0f, 1.0f),
+		Vector4(-1.0f, 1.0f, -1.0f, 1.0f), Vector4(-1.0f, 0.0f, 0.0f, 1.0f), Vector4(1.0f, 1.0f, 1.0f, 1.0f),
+		Vector4(-1.0f, 1.0f, 1.0f, 1.0f), Vector4(-1.0f, 0.0f, 0.0f, 1.0f) , Vector4(0.0f, 1.0f, 1.0f, 1.0f),
+		Vector4(1.0f, -1.0f, 1.0f , 1.0f), Vector4(1.0f, 0.0f, 0.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f),
+		Vector4(1.0f, -1.0f, -1.0f, 1.0f), Vector4(1.0f, 0.0f, 0.0f, 1.0f), Vector4(1.0f, 0.0f, 1.0f, 1.0f),
+		Vector4(1.0f, 1.0f, -1.0f , 1.0f), Vector4(1.0f, 0.0f, 0.0f, 1.0f), Vector4(1.0f, 1.0f, 1.0f, 1.0f),
+		Vector4(1.0f, 1.0f, 1.0f, 1.0f), Vector4(1.0f, 0.0f, 0.0f, 1.0f), Vector4(0.0f, 1.0f, 1.0f, 1.0f),
+		Vector4(-1.0f, -1.0f, -1.0f, 1.0f), Vector4(0.0f, 0.0f, -1.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f),
+		Vector4(1.0f, -1.0f, -1.0f, 1.0f), Vector4(0.0f, 0.0f, -1.0f, 1.0f), Vector4(1.0f, 0.0f, 1.0f, 1.0f),
+		Vector4(1.0f, 1.0f, -1.0f , 1.0f), Vector4(0.0f, 0.0f, -1.0f, 1.0f), Vector4(1.0f, 1.0f, 1.0f, 1.0f),
+		Vector4(-1.0f, 1.0f, -1.0f, 1.0f), Vector4(0.0f, 0.0f, -1.0f, 1.0f),  Vector4(0.0f, 1.0f, 1.0f, 1.0f),
+		Vector4(-1.0f, -1.0f, 1.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f),  Vector4(0.0f, 0.0f, 1.0f, 1.0f),
+		Vector4(1.0f, -1.0f, 1.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f), Vector4(1.0f, 0.0f, 1.0f, 1.0f),
+		Vector4(1.0f, 1.0f, 1.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f),  Vector4(1.0f, 1.0f, 1.0f, 1.0f),
+		Vector4(-1.0f, 1.0f, 1.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f), Vector4(0.0f, 1.0f, 1.0f, 1.0f) };
 	indeces = new int[]
 	{
 		3,1,0,
@@ -126,35 +114,34 @@ HRESULT LightTexturedComponent::Initialize() {
 	};
 
 	D3D11_BUFFER_DESC vertexBufDesc = {};
-	vertexBufDesc.Usage = D3D11_USAGE_DEFAULT;									// то, как часто будет обновляться вершинный буфер
-	vertexBufDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;							//куда буфер может быть привязан
-	vertexBufDesc.CPUAccessFlags = 0;											//0 -если не хотим чтения и записи с цпу
+	vertexBufDesc.Usage = D3D11_USAGE_DEFAULT;	
+	vertexBufDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufDesc.CPUAccessFlags = 0;	
 	vertexBufDesc.MiscFlags = 0;
 	vertexBufDesc.StructureByteStride = 0;
-	vertexBufDesc.ByteWidth = sizeof(Vector4) * 24*3;	//размер буфера в байтах
+	vertexBufDesc.ByteWidth = sizeof(Vector4) * 24*3;
 
 	D3D11_SUBRESOURCE_DATA vertexData = {};
 	vertexData.pSysMem = points;
 	vertexData.SysMemPitch = 0;
 	vertexData.SysMemSlicePitch = 0;
 
-	res = device->CreateBuffer(&vertexBufDesc, &vertexData, &vertices);
+	res = device->CreateBuffer(&vertexBufDesc, &vertexData, &vertices); ZCHECK(res);
 
-	//индексный буфер
 	D3D11_BUFFER_DESC indexBufDesc = {};
 	indexBufDesc.Usage = D3D11_USAGE_DEFAULT;
 	indexBufDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	indexBufDesc.CPUAccessFlags = 0;
 	indexBufDesc.MiscFlags = 0;
 	indexBufDesc.StructureByteStride = 0;
-	indexBufDesc.ByteWidth = sizeof(int) * 3*12;//indeces length
+	indexBufDesc.ByteWidth = sizeof(int) * 3*12;
 
 	D3D11_SUBRESOURCE_DATA indexData = {};
 	indexData.pSysMem = indeces;
 	indexData.SysMemPitch = 0;
 	indexData.SysMemSlicePitch = 0;
 
-	res = device->CreateBuffer(&indexBufDesc, &indexData, &indexBuffer);
+	res = device->CreateBuffer(&indexBufDesc, &indexData, &indexBuffer);  ZCHECK(res);
 
 	D3D11_BUFFER_DESC constBufDesc = {};
 	constBufDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -164,7 +151,7 @@ HRESULT LightTexturedComponent::Initialize() {
 	constBufDesc.StructureByteStride = 0;
 	constBufDesc.ByteWidth = sizeof(ConstantData);	
 
-	res = device->CreateBuffer(&constBufDesc, nullptr, &constantBuffer);
+	res = device->CreateBuffer(&constBufDesc, nullptr, &constantBuffer); ZCHECK(res);
 
 	D3D11_BUFFER_DESC lightBufDesc = {};
 	lightBufDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -174,17 +161,16 @@ HRESULT LightTexturedComponent::Initialize() {
 	lightBufDesc.StructureByteStride = 0;
 	lightBufDesc.ByteWidth = sizeof(ConstantData);
 
-	res = device->CreateBuffer(&lightBufDesc, nullptr, &lightBuffer);
+	res = device->CreateBuffer(&lightBufDesc, nullptr, &lightBuffer); ZCHECK(res);
 
 	CD3D11_RASTERIZER_DESC rastDesc = {};
 	rastDesc.CullMode = D3D11_CULL_BACK;
 	rastDesc.FillMode = D3D11_FILL_SOLID;
-	rastDesc.FrontCounterClockwise = true;
+	rastDesc.FrontCounterClockwise = true;	
 
+	res = device->CreateRasterizerState(&rastDesc, &rastState); ZCHECK(res);
 
-	res = device->CreateRasterizerState(&rastDesc, &rastState);
-
-	texLoader->LoadTextureFromFile(textureName, texture, texSrv, true, false); //грузим нашу текстуру
+	res = texLoader->LoadTextureFromFile(textureName, texture, texSrv, true, false); ZCHECK(res);
 
 	D3D11_SAMPLER_DESC samplerDesc = {};
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -198,7 +184,8 @@ HRESULT LightTexturedComponent::Initialize() {
 	samplerDesc.BorderColor[3] = 1.0f;
 	samplerDesc.MaxLOD = INT_MAX;
 
-	res = device->CreateSamplerState(&samplerDesc, &sampler); //создаем семплер стейт для текстуры
+	res = device->CreateSamplerState(&samplerDesc, &sampler); ZCHECK(res);
+	return res;
 }
 void LightTexturedComponent::Update(float deltaTime) {	
 	auto data = ConstantData{};	
@@ -208,16 +195,14 @@ void LightTexturedComponent::Update(float deltaTime) {
 	data.ViewerPos = Vector4(pos.x,pos.y,pos.z,1.0f);
 	x = cos(curAngle)*10;
 	y = sin(curAngle)*10;
-	curAngle = curAngle + 0.01;
-	std::cout << curAngle <<std::endl;
-	if (curAngle == 360)
+	curAngle = curAngle - 0.01;
+	if (curAngle == -360)
 	{
 		curAngle = 0;
 	}
 	auto lightData = LightData{};
-	lightData.Color = Vector4(255.0f, 255.0f, 255.0f, 1.0f);
-	lightData.Direction = Vector4(x, 100.0f, y, 1.0f);
-	lightData.KaSpecPowKsX = Vector4(0.5f, 0.5f, 0.2f, 1.0f);
+	lightData.Direction = Vector4(x, 10.0f, y, 1.0f);
+	lightData.KaSpecPowKsX = Vector4(0.3, 1, 1, 1.0f);
 	context->UpdateSubresource(constantBuffer, 0, nullptr, &data, 0, 0);
 	context->UpdateSubresource(lightBuffer, 0, nullptr, &lightData, 0, 0);
 }

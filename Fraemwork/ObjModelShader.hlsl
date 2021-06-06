@@ -8,7 +8,6 @@ struct ConstantData
 struct LightData
 {
     float4 Direction;
-    float4 Color;
     float4 KaSpecPowKsX;
 };
 
@@ -59,7 +58,7 @@ float4 PSMain1(PS_IN input, in bool isFrontFace : SV_IsFrontFace) : SV_Target
     return col;
 }
 
-float4 PSMain(PS_IN input, in bool isFrontFace : SV_IsFrontFace) : SV_Target
+float4 PSMain(PS_IN input) : SV_Target
 {
     float4 col = DiffuseMap.Sample(Sampler, float2(input.tex.x, 1.0f - input.tex.y));
 	
@@ -68,14 +67,14 @@ float4 PSMain(PS_IN input, in bool isFrontFace : SV_IsFrontFace) : SV_Target
     float3 kd = col.xyz;
     float3 normal = normalize(input.normal.xyz);
     float3 viewDir = normalize(ConstData.ViewerPos.xyz - input.worldPos.xyz);
-    float3 lightDir = -Lights.Direction.xyz; //float3(10, 10, 0)
-    float3 refVec = normalize(reflect(lightDir, normal));
+    float3 lightDir = Lights.Direction.xyz;   
+    float3 diffuse = saturate(dot(lightDir, normal)) * kd;
+        
+    float3 refVec1 = normalize(2 * diffuse * normal - lightDir);
+    float3 spec1 = pow(saturate(dot(refVec1, viewDir)), Lights.KaSpecPowKsX.y) * Lights.KaSpecPowKsX.z;
     
-    float3 diffuse = max(0, dot(lightDir, normal)) * kd;
-    float3 ambient = kd * Lights.KaSpecPowKsX.x; //
-    float3 spec = pow(max(0, dot(-viewDir, refVec)), Lights.KaSpecPowKsX.y) * Lights.KaSpecPowKsX.z; // 
+    float3 ambient = kd * Lights.KaSpecPowKsX.x;    
     
-    
-    return float4((diffuse + ambient + spec), 1.0f); //ConstData.Color.xyzfloat3(255, 255, 255) * 
+    return float4(ambient + diffuse + spec1, 1.0f);
 
 }
