@@ -3,7 +3,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include "Libs.h"
 #include <Windows.h>
-#include <wrl.h>
 #include "DisplayWin32.h"
 #include "TriangleComponent.h"
 #include "InputDevice.h"

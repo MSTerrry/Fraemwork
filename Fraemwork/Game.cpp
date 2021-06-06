@@ -111,7 +111,7 @@ HRESULT Game::PrepareResources() {
 	res = CreateBackBuffer(); ZCHECK(res);
 	ID3D11Texture2D* backTex;
 	res = swapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)&backTex);	ZCHECK(res);
-	res = Device->CreateRenderTargetView(backTex, nullptr, &RenderView); ZCHECK(res);
+	res = Device->CreateRenderTargetView(backTex, nullptr, &RenderView); ZCHECK(res);	
 	res = swapChain->QueryInterface<IDXGISwapChain1>(&swapChain1); ZCHECK(res);
 	Context->QueryInterface(IID_ID3DUserDefinedAnnotation, (void**)&DebugAnnotation);
 	Device->QueryInterface(IID_ID3D11Debug, (void**)&_debug);	
@@ -165,21 +165,24 @@ HRESULT Game::CreateBackBuffer() {
 	D3D11_TEXTURE2D_DESC depthTexDesc = {};
 	depthTexDesc.ArraySize = 1;
 	depthTexDesc.MipLevels = 1;
-	depthTexDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+	depthTexDesc.Format = DXGI_FORMAT_R32_TYPELESS;//
 	depthTexDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL;
 	depthTexDesc.CPUAccessFlags = 0;
 	depthTexDesc.MiscFlags = 0;
 	depthTexDesc.Usage = D3D11_USAGE_DEFAULT;
 	depthTexDesc.Width = Display->ScreenWidth;
 	depthTexDesc.Height = Display->ScreenHeight;
-	depthTexDesc.SampleDesc = { 1,0 };
-	res = Device->CreateTexture2D(&depthTexDesc, nullptr, &_depthBuffer); ZCHECK(res);
+	depthTexDesc.SampleDesc = { 1, 0 };
+
+	res = Device->CreateTexture2D(&depthTexDesc, nullptr, &_depthBuffer);
+	ZCHECK(res);
 
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilDesc = {};
 	depthStencilDesc.Format = DXGI_FORMAT_D32_FLOAT;
 	depthStencilDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	depthStencilDesc.Flags = 0;
-	res = Device->CreateDepthStencilView(_depthBuffer, &depthStencilDesc, &DepthStencilView); ZCHECK(res);
+
+	res = Device->CreateDepthStencilView(_depthBuffer, &depthStencilDesc, &DepthStencilView);
 	return res;
 }
 void Game::RestoreTargets() {	
@@ -211,7 +214,7 @@ int Game::Draw(HWND hWnd) {
 	
 	float color[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
-	Context->OMSetRenderTargets(1, &RenderView, nullptr);
+	Context->OMSetRenderTargets(1, &RenderView, DepthStencilView);
 	Context->ClearRenderTargetView(RenderView, color);
 	Context->ClearDepthStencilView(DepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0.0f);
 	tGame->Update(deltaTime);

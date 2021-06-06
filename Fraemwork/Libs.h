@@ -14,5 +14,5 @@
 #include "SimpleMath.h"
 #include "Camera.h"
 #include "Keys.h"
-
+#include <wrl.h>
 #define ZCHECK(exp) if(FAILED(exp)) { printf("Check failed at file: %s at line %i", __FILE__, __LINE__); return res; }

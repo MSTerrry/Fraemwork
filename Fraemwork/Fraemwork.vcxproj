@@ -142,6 +142,8 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CameraController.cpp" />
+    <ClCompile Include="CubeComponent.cpp" />
+    <ClCompile Include="CubeWithTrianglesGame.cpp" />
     <ClCompile Include="Delegates.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="InputDevice.cpp" />
@@ -157,10 +159,13 @@
     <ClCompile Include="TinyObjModelComponent.cpp" />
     <ClCompile Include="TransformGame.cpp" />
     <ClCompile Include="TriangleComponent.cpp" />
+    <ClCompile Include="TrueTriangleComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraController.h" />
+    <ClInclude Include="CubeComponent.h" />
+    <ClInclude Include="CubeWithTrianglesGame.h" />
     <ClInclude Include="Delegates.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameComponent.h" />
@@ -178,6 +183,7 @@
     <ClInclude Include="TransformGame.h" />
     <ClInclude Include="TriangleComponent.h" />
     <ClInclude Include="DisplayWin32.h" />
+    <ClInclude Include="TrueTriangleComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Delegates.natvis" />
@@ -198,7 +204,7 @@
     </FxCompile>
     <FxCompile Include="TinyModelShader.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VSMain</EntryPointName>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
     </FxCompile>
