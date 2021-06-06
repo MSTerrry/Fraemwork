@@ -4,6 +4,9 @@ struct ConstantData {
 	Matrix WorldViewProj;
 	Matrix World;
 	Vector4 ViewerPos;
+};
+
+struct LightData {
 	Vector4 Direction;
 	Vector4 Color;
 	Vector4 KaSpecPowKsX;
@@ -33,8 +36,8 @@ void LightTexturedComponent::Draw(float deltaTime) {
 	context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 	context->IASetVertexBuffers(0, 1, &vertices, &strides, &offsets);
 
-	context->VSSetConstantBuffers(0, 1, &constantBuffer);		
-	context->PSSetConstantBuffers(0, 1, &constantBuffer);
+	context->VSSetConstantBuffers(0, 1, &constantBuffer);	
+	context->PSSetConstantBuffers(1, 1, &lightBuffer);
 	context->PSSetShaderResources(0, 1, &texSrv);
 	context->PSSetSamplers(0, 1, &sampler);
 
@@ -163,10 +166,20 @@ HRESULT LightTexturedComponent::Initialize() {
 
 	res = device->CreateBuffer(&constBufDesc, nullptr, &constantBuffer);
 
+	D3D11_BUFFER_DESC lightBufDesc = {};
+	lightBufDesc.Usage = D3D11_USAGE_DEFAULT;
+	lightBufDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	lightBufDesc.CPUAccessFlags = 0;
+	lightBufDesc.MiscFlags = 0;
+	lightBufDesc.StructureByteStride = 0;
+	lightBufDesc.ByteWidth = sizeof(ConstantData);
+
+	res = device->CreateBuffer(&lightBufDesc, nullptr, &lightBuffer);
+
 	CD3D11_RASTERIZER_DESC rastDesc = {};
 	rastDesc.CullMode = D3D11_CULL_BACK;
 	rastDesc.FillMode = D3D11_FILL_SOLID;
-	rastDesc.FrontCounterClockwise = true;		//обход по часовой или против часовой ститается фронтом
+	rastDesc.FrontCounterClockwise = true;
 
 
 	res = device->CreateRasterizerState(&rastDesc, &rastState);
@@ -201,10 +214,12 @@ void LightTexturedComponent::Update(float deltaTime) {
 	{
 		curAngle = 0;
 	}
-	data.Color = Vector4(255.0f, 255.0f, 255.0f, 1.0f);
-	data.Direction = Vector4(x, 0.0f, y, 1.0f);
-	data.KaSpecPowKsX = Vector4(0.5f, 0.5f, 0.2f, 1.0f);
+	auto lightData = LightData{};
+	lightData.Color = Vector4(255.0f, 255.0f, 255.0f, 1.0f);
+	lightData.Direction = Vector4(x, 100.0f, y, 1.0f);
+	lightData.KaSpecPowKsX = Vector4(0.5f, 0.5f, 0.2f, 1.0f);
 	context->UpdateSubresource(constantBuffer, 0, nullptr, &data, 0, 0);
+	context->UpdateSubresource(lightBuffer, 0, nullptr, &lightData, 0, 0);
 }
 void LightTexturedComponent::Reload() {
 

@@ -146,6 +146,7 @@ HRESULT TriangleComponent::Initialize() {
 	CD3D11_RASTERIZER_DESC rastDesc = {};
 	rastDesc.CullMode = D3D11_CULL_BACK; //D3D11_CULL_NONE
 	rastDesc.FillMode = D3D11_FILL_SOLID;
+	rastDesc.FrontCounterClockwise = true;
 
 	res = device->CreateRasterizerState(&rastDesc, &rastState);
 	res = context->QueryInterface(IID_ID3DUserDefinedAnnotation, (void**)&annotation);

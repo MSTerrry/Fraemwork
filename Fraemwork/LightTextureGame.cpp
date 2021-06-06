@@ -9,6 +9,10 @@ void LightTextureGame::Initialize() {
 	pc->Initialize();
 	Components.push_back(pc);
 	
+	tri = new TriangleComponent(Device, Context, cam);
+	tri->Initialize();
+	Components.push_back(tri);
+
 	auto tex = new LightTexturedComponent(Device,Context,cam,L"",L"Wall.png");
 	tex->Initialize();
 	Components.push_back(tex);
@@ -25,9 +29,7 @@ void LightTextureGame::Initialize() {
 	//atv->Position = DirectX::SimpleMath::Vector3(400,0,0);
 	//Components.push_back(atv);
 	
-	tri = new TriangleComponent(Device, Context, cam);
-	tri->Initialize();
-	Components.push_back(tri);
+	
 	//InDevice->MouseMove.AddRaw(this, &LightTextureGame::OnMouseMove);
 }
 
