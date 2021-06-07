@@ -6,8 +6,8 @@ void TrueTriangleComponent::DestroyResources() {
 	if (pixelShader) pixelShader->Release();
 }
 
-TrueTriangleComponent::TrueTriangleComponent(ID3D11Device* device, ID3D11DeviceContext* context, Camera* camera, Vector3 pos, Vector4* points, bool side, bool zTranslation)
-	:device(device), context(context), camera(camera),points(points),position(pos),side(side),zTranslation(zTranslation)
+TrueTriangleComponent::TrueTriangleComponent(ID3D11Device* device, ID3D11DeviceContext* context, Camera* camera, Vector3 pos, Vector4* points, bool zTranslation)
+	:device(device), context(context), camera(camera),points(points),position(pos),zTranslation(zTranslation)
 {	
 	curCoordinate = 1;
 	Initialize();
@@ -150,18 +150,31 @@ void TrueTriangleComponent::Update(float deltaTime) {
 		else curCoordinate = -4;
 		if (curCoordinate >= 0)
 		{
-			if (zTranslation) 
-				position.z *= 1.1;
+			if (zTranslation)
+				newCoordinate = position.z*1.1;
 			else
-				position.x *= 1.1;
+				newCoordinate = position.x * 1.1;
 		}
 		else {
 			if (zTranslation)
-				position.z /= 1.1;				
+				newCoordinate = position.z / 1.1;
 			else
-				position.x /= 1.1;
+				newCoordinate = position.x / 1.1;
 		}	
 	}	
+	if (zTranslation) {
+		if (position.z < newCoordinate && -(position.z - newCoordinate) > 0.01)
+			position.z += 0.01;
+		else if (position.z > newCoordinate && position.z - newCoordinate > 0.01)
+			position.z -= 0.01;
+	}
+	else {
+		if (position.x < newCoordinate && -(position.x - newCoordinate) > 0.01)
+			position.x += 0.01;
+		else if (position.x > newCoordinate && position.x - newCoordinate > 0.01)
+			position.x -= 0.01;
+	}
+	
 	auto resVector = Matrix::CreateTranslation(-position) * (zTranslation? Matrix::CreateRotationZ(curRotation) :Matrix::CreateRotationX(curRotation)) * Matrix::CreateTranslation(position);
 	auto pos = resVector * Matrix::CreateTranslation(position) * Matrix::CreateRotationY(curRotation) * Matrix::CreateTranslation(Vector3::Zero);
 	auto m = pos * camera->ViewMatrix * camera->ProjMatrix;

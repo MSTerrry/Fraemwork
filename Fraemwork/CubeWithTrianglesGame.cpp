@@ -35,13 +35,13 @@ void CubeWithTrianglesGame::CreateTriangles() {
 			Vector4(1,0,-1,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f)
 	};
 	Components.push_back(new TrueTriangleComponent(Device, Context, cam,
-		Vector3(4, 0, 0), t1,true,false));
+		Vector3(4, 0, 0), t1,false));
 	Components.push_back(new TrueTriangleComponent(Device, Context, cam,
-		Vector3(0, 0, 4), t2,true,true));
+		Vector3(0, 0, 4), t2,true));
 	Components.push_back(new TrueTriangleComponent(Device, Context, cam,
-		Vector3(-4, 0, 0), t3,false,false));
+		Vector3(-4, 0, 0), t3,false));
 	Components.push_back(new TrueTriangleComponent(Device, Context, cam,
-		Vector3(0, 0, -4), t4,false,true));
+		Vector3(0, 0, -4), t4,true));
 }
 
 void CubeWithTrianglesGame::Update(float deltaTime) {

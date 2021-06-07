@@ -18,11 +18,11 @@ class CubeComponent : public GameComponent
 	ID3D11Device* device;
 	ID3D11DeviceContext* context;
 	Camera* camera;
-	double curScale = 1;
-	double curRotation;
-	double scaleIteration = 1;
-	double curCycle;
-	
+	float curScale = 1;
+	float curRotation;
+	float scaleIteration = 1;
+	float curCycle;
+	float lastScale = 1;
 	HRESULT CreateShader(LPCWSTR fileName, LPCSTR entryPoint, LPCSTR shaderModel, ID3DBlob** vertexBC, D3D_SHADER_MACRO* shaderMacros);
 public:
 
