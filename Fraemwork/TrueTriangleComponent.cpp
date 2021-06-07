@@ -105,9 +105,9 @@ HRESULT TrueTriangleComponent::Initialize() {
 
 	device->CreateBuffer(&indexBufDesc, &indexData, &indexBuffer);
 	D3D11_BUFFER_DESC vertexBufDesc = {};
-	vertexBufDesc.Usage = D3D11_USAGE_DYNAMIC;
+	vertexBufDesc.Usage = D3D11_USAGE_DEFAULT;
 	vertexBufDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vertexBufDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	vertexBufDesc.CPUAccessFlags = 0;
 	vertexBufDesc.MiscFlags = 0;
 	vertexBufDesc.StructureByteStride = 0;
 	vertexBufDesc.ByteWidth = sizeof(Vector4) * 3*2;
