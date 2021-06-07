@@ -1,9 +1,14 @@
 #pragma once
 #include "Libs.h"
-#pragma comment(lib, "d3d11.lib")
-
+using namespace DirectX::SimpleMath;
 class GameComponent {
 public:
+	GameComponent* Parent = nullptr;
+	float curScale = 1;
+	float curRotation;
+	float scaleIteration = 1;
+	float lastScale = 1;
+	Matrix World;
 	virtual ~GameComponent() = default;	
 	GameComponent() {
 

@@ -21,10 +21,6 @@ class TrueTriangleComponent : public GameComponent
 	Camera* camera;
 	DirectX::SimpleMath::Vector3 position;
 	HRESULT CreateShader(LPCWSTR fileName, LPCSTR entryPoint, LPCSTR shaderModel, ID3DBlob** vertexBC, D3D_SHADER_MACRO* shaderMacros);
-	
-	float curRotation;
-	float curCoordinate;
-	float newCoordinate;
 	bool zTranslation;
 public:
 	TrueTriangleComponent(ID3D11Device* device, ID3D11DeviceContext* context, Camera* camera, DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector4* points,

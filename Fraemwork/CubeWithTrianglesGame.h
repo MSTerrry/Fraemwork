@@ -2,7 +2,7 @@
 #include "Game.h"
 #include "CameraController.h"
 #include "PlaneComponent.h"
-
+#include "CubeComponent.h"
 class CubeWithTrianglesGame : public Game
 {
 public:
@@ -15,6 +15,6 @@ public:
 	virtual void Initialize() override;
 	virtual void Update(float deltaTime) override;
 	virtual void PostDraw(float deltaTime) override;
-	void CreateTriangles();
+	void CreateTriangles(CubeComponent* cube);
 	void OnMouseMove(InputDevice::MouseMoveEventArgs& args);
 };

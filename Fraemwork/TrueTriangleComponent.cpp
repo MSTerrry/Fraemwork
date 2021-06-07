@@ -9,7 +9,6 @@ void TrueTriangleComponent::DestroyResources() {
 TrueTriangleComponent::TrueTriangleComponent(ID3D11Device* device, ID3D11DeviceContext* context, Camera* camera, Vector3 pos, Vector4* points, bool zTranslation)
 	:device(device), context(context), camera(camera),points(points),position(pos),zTranslation(zTranslation)
 {	
-	curCoordinate = 1;
 	Initialize();
 }
 
@@ -72,8 +71,6 @@ HRESULT TrueTriangleComponent::Initialize() {
 	res = CreateShader(L"Simple.hlsl", "VSMain", "vs_5_0", &VertexShaderByteCode, nullptr);
 	if (FAILED(res)) return res;
 
-	//D3D_SHADER_MACRO Shader_Macros[] = { "TEST", "1", "TCOLOR", "float4(0.0f, 1.0f, 0.0f, 1.0f)", nullptr, nullptr };
-	;
 	res = CreateShader(L"Simple.hlsl", "PSMain", "ps_5_0", &PixelShaderByteCode, nullptr);
 	if (FAILED(res)) return res;
 
@@ -141,42 +138,16 @@ HRESULT TrueTriangleComponent::Initialize() {
 	return res;
 }
 void TrueTriangleComponent::Update(float deltaTime) {
-	curRotation += 0.04;
-	if (curRotation - 6.28 > 0)
-	{		
-		curRotation = 0;		
-		if (curCoordinate < 5)
-			curCoordinate++;						
-		else curCoordinate = -4;
-		if (curCoordinate >= 0)
-		{
-			if (zTranslation)
-				newCoordinate = position.z*1.1;
-			else
-				newCoordinate = position.x * 1.1;
-		}
-		else {
-			if (zTranslation)
-				newCoordinate = position.z / 1.1;
-			else
-				newCoordinate = position.x / 1.1;
-		}	
-	}	
+
+	auto resVector = Vector3(position.x, position.y, position.z);
 	if (zTranslation) {
-		if (position.z < newCoordinate && -(position.z - newCoordinate) > 0.01)
-			position.z += 0.01;
-		else if (position.z > newCoordinate && position.z - newCoordinate > 0.01)
-			position.z -= 0.01;
+		resVector.z = resVector.z * Parent->lastScale;
 	}
-	else {
-		if (position.x < newCoordinate && -(position.x - newCoordinate) > 0.01)
-			position.x += 0.01;
-		else if (position.x > newCoordinate && position.x - newCoordinate > 0.01)
-			position.x -= 0.01;
-	}
+	else resVector.x = resVector.x * Parent->lastScale;	
 	
-	auto resVector = Matrix::CreateTranslation(-position) * (zTranslation? Matrix::CreateRotationZ(curRotation) :Matrix::CreateRotationX(curRotation)) * Matrix::CreateTranslation(position);
-	auto pos = resVector * Matrix::CreateTranslation(position) * Matrix::CreateRotationY(curRotation) * Matrix::CreateTranslation(Vector3::Zero);
+	auto rotationM = Matrix::CreateTranslation(-resVector) * (zTranslation? Matrix::CreateRotationZ(Parent->curRotation) : 
+		Matrix::CreateRotationX(Parent->curRotation)) * Matrix::CreateTranslation(resVector);
+	auto pos = rotationM * Matrix::CreateTranslation(resVector) * Parent->World;
 	auto m = pos * camera->ViewMatrix * camera->ProjMatrix;
 	D3D11_MAPPED_SUBRESOURCE res = {};
 	context->Map(constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &res);

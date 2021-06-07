@@ -178,8 +178,8 @@ void CubeComponent::Update(float deltaTime) {
 		lastScale += 0.01;
 	else if (lastScale > curScale && lastScale - curScale > 0.01)
 		lastScale -= 0.01;
-	auto pos = Matrix::CreateRotationY(curRotation) * Matrix::CreateScale(lastScale) * Matrix::CreateTranslation(position);//
-	auto m = pos * camera->ViewMatrix * camera->ProjMatrix;
+	World = Matrix::CreateRotationY(curRotation) * Matrix::CreateTranslation(position);
+	auto m = World * Matrix::CreateScale(lastScale) * camera->ViewMatrix * camera->ProjMatrix;
 	D3D11_MAPPED_SUBRESOURCE res = {};
 	context->Map(constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
 	auto dataP = reinterpret_cast<float*>(res.pData);

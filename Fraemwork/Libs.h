@@ -9,10 +9,11 @@
 #include <DirectXMath.h>
 #include <d3dcompiler.h>
 #include <iostream>
-#include "GameComponent.h"
 #include "winuser.h"
 #include "SimpleMath.h"
 #include "Camera.h"
 #include "Keys.h"
 #include <wrl.h>
+
+#pragma comment(lib, "d3d11.lib")
 #define ZCHECK(exp) if(FAILED(exp)) { printf("Check failed at file: %s at line %i", __FILE__, __LINE__); return res; }

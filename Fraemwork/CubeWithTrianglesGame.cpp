@@ -10,38 +10,50 @@ void CubeWithTrianglesGame::Initialize() {
 	Components.push_back(pc);
 	auto cube = new CubeComponent(Device, Context, cam);
 	Components.push_back(cube);
-	CreateTriangles();
+	CreateTriangles(cube);
 	
 }
-void CubeWithTrianglesGame::CreateTriangles() {
-	auto t1 = new Vector4[]{
+void CubeWithTrianglesGame::CreateTriangles(CubeComponent* cube) {
+	auto t1 = new TrueTriangleComponent(Device, Context, cam,
+		Vector3(4, 0, 0),
+		new Vector4[]{
 			Vector4(1,0,1,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f),
 			Vector4(2,0,0,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f),
-			Vector4(1,0,-1,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f)
-	};
-	auto t2 = new Vector4[]{
+			Vector4(1,0,-1,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f) },
+			false);
+	t1->Parent = cube;
+
+	auto t2 = new TrueTriangleComponent(Device, Context, cam,
+		Vector3(0, 0, 4),
+		new Vector4[]{
 			Vector4(-1,0,1,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f),
 			Vector4(0,0,2,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f),
 			Vector4(1,0,1,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f)
-	};
-	auto t3 = new Vector4[]{
+		},
+		true);
+	t2->Parent = cube;
+	auto t3 = new TrueTriangleComponent(Device, Context, cam,
+		Vector3(-4, 0, 0), 
+		new Vector4[]{
 			Vector4(-1,0,1,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f),
 			Vector4(-2,0,0,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f),
 			Vector4(-1,0,-1,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f)
-	};
-	auto t4 = new Vector4[]{
+		},
+		false);
+	t3->Parent = cube;
+	auto t4 = new TrueTriangleComponent(Device, Context, cam,
+		Vector3(0, 0, -4),
+		new Vector4[]{
 			Vector4(-1,0,-1,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f),
 			Vector4(0,0,-2,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f),
 			Vector4(1,0,-1,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f)
-	};
-	Components.push_back(new TrueTriangleComponent(Device, Context, cam,
-		Vector3(4, 0, 0), t1,false));
-	Components.push_back(new TrueTriangleComponent(Device, Context, cam,
-		Vector3(0, 0, 4), t2,true));
-	Components.push_back(new TrueTriangleComponent(Device, Context, cam,
-		Vector3(-4, 0, 0), t3,false));
-	Components.push_back(new TrueTriangleComponent(Device, Context, cam,
-		Vector3(0, 0, -4), t4,true));
+		},
+		true);
+	t4->Parent = cube;
+	Components.push_back(t1);
+	Components.push_back(t2);
+	Components.push_back(t3);
+	Components.push_back(t4);
 }
 
 void CubeWithTrianglesGame::Update(float deltaTime) {
