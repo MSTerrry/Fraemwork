@@ -6,9 +6,11 @@ void TrueTriangleComponent::DestroyResources() {
 	if (pixelShader) pixelShader->Release();
 }
 
-TrueTriangleComponent::TrueTriangleComponent(ID3D11Device* device, ID3D11DeviceContext* context, Camera* camera, Vector3 pos, Vector4* points, bool zTranslation)
+TrueTriangleComponent::TrueTriangleComponent(ID3D11Device* device, ID3D11DeviceContext* context, Camera* camera, Vector3 pos, Vector4* points, bool zTranslation, Transform* parent)
 	:device(device), context(context), camera(camera),points(points),position(pos),zTranslation(zTranslation)
 {	
+	transform = new Transform(pos, 1);
+	transform->Parent = parent;
 	Initialize();
 }
 
@@ -139,16 +141,14 @@ HRESULT TrueTriangleComponent::Initialize() {
 }
 void TrueTriangleComponent::Update(float deltaTime) {
 
-	auto resVector = Vector3(position.x, position.y, position.z);
-	if (zTranslation) {
-		resVector.z = resVector.z * Parent->lastScale;
-	}
-	else resVector.x = resVector.x * Parent->lastScale;	
-	
-	auto rotationM = Matrix::CreateTranslation(-resVector) * (zTranslation? Matrix::CreateRotationZ(Parent->curRotation) : 
-		Matrix::CreateRotationX(Parent->curRotation)) * Matrix::CreateTranslation(resVector);
-	auto pos = rotationM * Matrix::CreateTranslation(resVector) * Parent->World;
-	auto m = pos * camera->ViewMatrix * camera->ProjMatrix;
+	curRotation += 0.04;
+	if (curRotation - 6.28 > 0)
+	{
+		curRotation = 0;
+	}	
+	transform->rotation = (zTranslation? Quaternion::CreateFromYawPitchRoll(0, 0, curRotation) : Quaternion::CreateFromYawPitchRoll(0, curRotation, 0));
+	transform->Update();
+	auto m = transform->world * camera->ViewMatrix * camera->ProjMatrix;
 	D3D11_MAPPED_SUBRESOURCE res = {};
 	context->Map(constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
 	auto dataP = reinterpret_cast<float*>(res.pData);

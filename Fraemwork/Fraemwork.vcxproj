@@ -155,6 +155,7 @@
     <ClCompile Include="ObjModelComponent.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="PlaneComponent.cpp" />
+    <ClCompile Include="Transform.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
     <ClCompile Include="TinyObjModelComponent.cpp" />
     <ClCompile Include="TransformGame.cpp" />
@@ -180,6 +181,7 @@
     <ClInclude Include="PlaneComponent.h" />
     <ClInclude Include="TextureLoader.h" />
     <ClInclude Include="TinyObjModelComponent.h" />
+    <ClInclude Include="Transform.h" />
     <ClInclude Include="TransformGame.h" />
     <ClInclude Include="TriangleComponent.h" />
     <ClInclude Include="DisplayWin32.h" />

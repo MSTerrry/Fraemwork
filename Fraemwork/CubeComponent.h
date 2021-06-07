@@ -1,6 +1,7 @@
 #pragma once
 #include "Libs.h"
 #include "GameComponent.h"
+
 class CubeComponent : public GameComponent
 {
 	ID3D11VertexShader* vertexShader = nullptr;

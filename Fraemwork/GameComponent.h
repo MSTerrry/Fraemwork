@@ -1,14 +1,14 @@
 #pragma once
 #include "Libs.h"
+#include "Transform.h"
 using namespace DirectX::SimpleMath;
 class GameComponent {
 public:
-	GameComponent* Parent = nullptr;
+	Transform* transform = nullptr;
 	float curScale = 1;
 	float curRotation;
 	float scaleIteration = 1;
 	float lastScale = 1;
-	Matrix World;
 	virtual ~GameComponent() = default;	
 	GameComponent() {
 

@@ -10,6 +10,7 @@ void CubeComponent::DestroyResources() {
 CubeComponent::CubeComponent(ID3D11Device* device, ID3D11DeviceContext* context, Camera* camera) :device(device), context(context), camera(camera)
 {
 	position = Vector3(0, 0, 0);
+	transform = new Transform(position, 1);
 	Initialize();
 }
 
@@ -174,12 +175,15 @@ void CubeComponent::Update(float deltaTime) {
 			scaleIteration = -4;			
 		curScale = scaleIteration>=0? curScale * 1.1 : curScale / 1.1;
 	}
-	if (lastScale < curScale && -(lastScale - curScale) > 0.01)
-		lastScale += 0.01;
-	else if (lastScale > curScale && lastScale - curScale > 0.01)
-		lastScale -= 0.01;
-	World = Matrix::CreateRotationY(curRotation) * Matrix::CreateTranslation(position);
-	auto m = World * Matrix::CreateScale(lastScale) * camera->ViewMatrix * camera->ProjMatrix;
+	if (transform->scale < curScale && -(transform->scale - curScale) > 0.01)
+		transform->scale += 0.01;
+	else if (transform->scale > curScale && transform->scale - curScale > 0.01)
+		transform->scale -= 0.01;
+
+	
+	transform->rotation = Quaternion::CreateFromYawPitchRoll(curRotation, 0, 0);
+	transform->Update();
+	auto m = transform->world * camera->ViewMatrix * camera->ProjMatrix;
 	D3D11_MAPPED_SUBRESOURCE res = {};
 	context->Map(constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
 	auto dataP = reinterpret_cast<float*>(res.pData);

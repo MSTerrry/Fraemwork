@@ -1,5 +1,6 @@
 #pragma once
 #include "GameComponent.h"
+
 using namespace DirectX;
 
 class TrueTriangleComponent : public GameComponent
@@ -19,12 +20,13 @@ class TrueTriangleComponent : public GameComponent
 	ID3D11Device* device;
 	ID3D11DeviceContext* context;
 	Camera* camera;
+	Transform* transform=nullptr;
 	DirectX::SimpleMath::Vector3 position;
 	HRESULT CreateShader(LPCWSTR fileName, LPCSTR entryPoint, LPCSTR shaderModel, ID3DBlob** vertexBC, D3D_SHADER_MACRO* shaderMacros);
 	bool zTranslation;
 public:
 	TrueTriangleComponent(ID3D11Device* device, ID3D11DeviceContext* context, Camera* camera, DirectX::SimpleMath::Vector3 pos, DirectX::SimpleMath::Vector4* points,
-		bool zTranslation);
+		bool zTranslation, Transform* parent);
 	virtual void DestroyResources() override;
 	virtual void Draw(float deltaTime) override;
 	virtual HRESULT Initialize() override;

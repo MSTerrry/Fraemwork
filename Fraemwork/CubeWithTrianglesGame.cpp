@@ -1,6 +1,7 @@
 #include "CubeComponent.h"
 #include "CubeWithTrianglesGame.h"
 #include "TrueTriangleComponent.h"
+#include "Transform.h"
 void CubeWithTrianglesGame::Initialize() {
 	cam = new Camera(Display);
 	auto t1 = Matrix::CreateScale(1.1);
@@ -20,9 +21,7 @@ void CubeWithTrianglesGame::CreateTriangles(CubeComponent* cube) {
 			Vector4(1,0,1,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f),
 			Vector4(2,0,0,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f),
 			Vector4(1,0,-1,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f) },
-			false);
-	t1->Parent = cube;
-
+			false,cube->transform);	
 	auto t2 = new TrueTriangleComponent(Device, Context, cam,
 		Vector3(0, 0, 4),
 		new Vector4[]{
@@ -30,8 +29,7 @@ void CubeWithTrianglesGame::CreateTriangles(CubeComponent* cube) {
 			Vector4(0,0,2,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f),
 			Vector4(1,0,1,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f)
 		},
-		true);
-	t2->Parent = cube;
+		true, cube->transform);
 	auto t3 = new TrueTriangleComponent(Device, Context, cam,
 		Vector3(-4, 0, 0), 
 		new Vector4[]{
@@ -39,8 +37,7 @@ void CubeWithTrianglesGame::CreateTriangles(CubeComponent* cube) {
 			Vector4(-2,0,0,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f),
 			Vector4(-1,0,-1,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f)
 		},
-		false);
-	t3->Parent = cube;
+		false, cube->transform);
 	auto t4 = new TrueTriangleComponent(Device, Context, cam,
 		Vector3(0, 0, -4),
 		new Vector4[]{
@@ -48,8 +45,7 @@ void CubeWithTrianglesGame::CreateTriangles(CubeComponent* cube) {
 			Vector4(0,0,-2,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f),
 			Vector4(1,0,-1,1), Vector4(1.0f, 0.0f, 0.0f, 1.0f)
 		},
-		true);
-	t4->Parent = cube;
+		true, cube->transform);
 	Components.push_back(t1);
 	Components.push_back(t2);
 	Components.push_back(t3);
