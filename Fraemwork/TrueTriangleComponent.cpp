@@ -142,7 +142,7 @@ HRESULT TrueTriangleComponent::Initialize() {
 }
 void TrueTriangleComponent::Update(float deltaTime) {
 	curRotation += 0.04;
-	if (curRotation - 6.28 < 0.01 && curRotation - 6.28 > 0)
+	if (curRotation - 6.28 > 0)
 	{		
 		curRotation = 0;		
 		if (curCoordinate < 5)
